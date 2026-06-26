@@ -89,12 +89,13 @@ class BitmapScaler(val imageScaler: ImageScaler) {
     }
 
     /**
-     * Draws a splash art zoomed uniformly so it fills the screen top-to-bottom, keeping its
-     * aspect ratio (no stretching) and leaving no black bands above/below. Used for the big
-     * character splashes in evolution and battle.
+     * Draws an image zoomed uniformly so it fills the screen top-to-bottom, keeping its
+     * aspect ratio (no stretching) and leaving no black bands above/below. Used for the
+     * vertical, full-screen-in-the-original images: evolution/battle splash arts and the
+     * transformation animation backgrounds.
      */
     @Composable
-    fun SplashBitmap(
+    fun FillHeightBitmap(
         bitmap: Bitmap,
         contentDescription: String,
         modifier: Modifier = Modifier,

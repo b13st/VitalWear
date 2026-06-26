@@ -228,7 +228,7 @@ class TransformationScreenFactory(
                 }
             }, PRIMARY_DELAY)
         }
-        bitmapScaler.ScaledBitmap(bitmap = transformationBitmaps.blackBackground, contentDescription = "Background", alignment = Alignment.BottomCenter)
+        bitmapScaler.FillHeightBitmap(bitmap = transformationBitmaps.blackBackground, contentDescription = "Background", alignment = Alignment.BottomCenter)
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
             Column(verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
                 .fillMaxWidth()
@@ -273,7 +273,7 @@ class TransformationScreenFactory(
         LaunchedEffect(true) {
             horizontalTarget = 0f
         }
-        bitmapScaler.ScaledBitmap(bitmap = transformationBitmaps.blackBackground, contentDescription = "Background", alignment = Alignment.BottomCenter)
+        bitmapScaler.FillHeightBitmap(bitmap = transformationBitmaps.blackBackground, contentDescription = "Background", alignment = Alignment.BottomCenter)
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
             Column(verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
                 .fillMaxWidth()
@@ -315,7 +315,7 @@ class TransformationScreenFactory(
                 }
             }, delay)
         }
-        bitmapScaler.ScaledBitmap(bitmap = transformationBitmaps.blackBackground, contentDescription = "Background", alignment = Alignment.BottomCenter)
+        bitmapScaler.FillHeightBitmap(bitmap = transformationBitmaps.blackBackground, contentDescription = "Background", alignment = Alignment.BottomCenter)
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
             Column(verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
                 .fillMaxWidth()
@@ -366,7 +366,7 @@ class TransformationScreenFactory(
                 onFinish.invoke()
             }
         }, PRIMARY_DELAY)
-        bitmapScaler.ScaledBitmap(bitmap = transformationBitmaps.blackBackground, contentDescription = "Background", alignment = Alignment.BottomCenter)
+        bitmapScaler.FillHeightBitmap(bitmap = transformationBitmaps.blackBackground, contentDescription = "Background", alignment = Alignment.BottomCenter)
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
             Column(verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
                 .fillMaxWidth()
@@ -387,7 +387,7 @@ class TransformationScreenFactory(
                 onFinish.invoke()
             }
         }, PRIMARY_DELAY)
-        bitmapScaler.ScaledBitmap(bitmap = firmwareSprites.newBackgrounds[iterations % 3], contentDescription = "Background", alignment = Alignment.BottomCenter)
+        bitmapScaler.FillHeightBitmap(bitmap = firmwareSprites.newBackgrounds[iterations % 3], contentDescription = "Background", alignment = Alignment.BottomCenter)
     }
 
     @Composable
@@ -397,7 +397,7 @@ class TransformationScreenFactory(
                 onFinish.invoke()
             }, PRIMARY_DELAY*2)
         }
-        bitmapScaler.SplashBitmap(bitmap = partner.characterSprites.sprites[CharacterSprites.SPLASH], contentDescription = "New Partner", alignment = Alignment.BottomCenter)
+        bitmapScaler.FillHeightBitmap(bitmap = partner.characterSprites.sprites[CharacterSprites.SPLASH], contentDescription = "New Partner", alignment = Alignment.BottomCenter)
     }
 
     @Composable
@@ -424,7 +424,7 @@ class TransformationScreenFactory(
                 charaterSprite = partner.characterSprites.sprites[CharacterSprites.IDLE_1]
             }
         }, PRIMARY_DELAY)
-        bitmapScaler.ScaledBitmap(bitmap = firmwareSprites.rayOfLightBackground, contentDescription = "Background", alignment = Alignment.BottomCenter)
+        bitmapScaler.FillHeightBitmap(bitmap = firmwareSprites.rayOfLightBackground, contentDescription = "Background", alignment = Alignment.BottomCenter)
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
             bitmapScaler.ScaledBitmap(bitmap = charaterSprite, contentDescription = "Character", alignment = Alignment.BottomCenter, modifier = Modifier.offset(y = backgroundHeight.times(-.05f)))
         }

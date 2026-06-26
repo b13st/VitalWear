@@ -25,7 +25,7 @@ class OpponentSplashFactory(private val bitmapScaler: BitmapScaler) {
             contentDescription = "Background",
         )
         val battleCharacter = battleModel.opponent
-        bitmapScaler.SplashBitmap(bitmap = battleCharacter.battleSprites.splashBitmap, contentDescription = "Opponent", alignment = Alignment.BottomCenter,
+        bitmapScaler.FillHeightBitmap(bitmap = battleCharacter.battleSprites.splashBitmap, contentDescription = "Opponent", alignment = Alignment.BottomCenter,
             modifier = Modifier.clickable {
                 leftScreenEarly = true
                 stateUpdater.invoke(FightTargetState.READY)
