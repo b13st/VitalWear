@@ -12,6 +12,7 @@ import com.github.cfogrady.vitalwear.battle.data.BattleResult
 import com.github.cfogrady.vitalwear.character.CharacterManager
 import com.github.cfogrady.vitalwear.common.character.CharacterSprites
 import com.github.cfogrady.vitalwear.composable.util.BitmapScaler
+import com.github.cfogrady.vitalwear.composable.util.ImageScaler
 import com.github.cfogrady.vitalwear.composable.util.PositionOffsetRatios
 import com.github.cfogrady.vitalwear.firmware.FirmwareManager
 import com.google.common.collect.Lists
@@ -24,9 +25,10 @@ class EndFightReactionFactory(private val bitmapScaler: BitmapScaler, private va
         Handler(Looper.getMainLooper()!!).postDelayed({
             finished.invoke()
         }, 2000)
+        val vbWidth = bitmapScaler.scaledDimension(ImageScaler.VB_WIDTH.toInt())
         bitmapScaler.FullScreenBackground(bitmap = background, contentDescription = "Background")
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth().offset(y = backgroundHeight.times(PositionOffsetRatios.CHARACTER_OFFSET_FROM_BOTTOM))) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(vbWidth).offset(y = backgroundHeight.times(PositionOffsetRatios.CHARACTER_OFFSET_FROM_BOTTOM))) {
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomEnd) {
                     if(emoteBitmaps.size > 1) {
                         bitmapScaler.AnimatedScaledBitmap(
