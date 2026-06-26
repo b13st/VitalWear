@@ -24,6 +24,7 @@ import com.github.cfogrady.vitalwear.character.VBCharacter
 import com.github.cfogrady.vitalwear.common.character.CharacterSprites
 import com.github.cfogrady.vitalwear.character.transformation.TransformationOption
 import com.github.cfogrady.vitalwear.composable.util.BitmapScaler
+import com.github.cfogrady.vitalwear.composable.util.ImageScaler
 import com.github.cfogrady.vitalwear.composable.util.VitalBoxFactory
 import com.github.cfogrady.vitalwear.common.composable.util.formatNumber
 import com.github.cfogrady.vitalwear.firmware.Firmware
@@ -74,6 +75,7 @@ class StatsMenuActivity : ComponentActivity() {
         val background = remember { backgroundManager.selectedBackground.value!! }
 
         val initialStatsPage = remember { mutableStateOf(0) }
+        val vbWidth = bitmapScaler.scaledDimension(ImageScaler.VB_WIDTH.toInt())
 
         vitalBoxFactory.VitalBox {
             bitmapScaler.FullScreenBackground(
@@ -81,21 +83,27 @@ class StatsMenuActivity : ComponentActivity() {
                 contentDescription = "Background",
             )
             val pagerState = rememberPagerState(pageCount = {1 + partner.transformationOptions.size})
-            VerticalPager(state = pagerState) {rootPage ->
-                when(rootPage) {
-                    0 -> {
-                        PartnerStats(initialPage = initialStatsPage, partner = partner)
-                    }
-                    else -> {
-                        val potentialOption = partner.transformationOptions[rootPage - 1]
-                        val highestCompletedAdventure = partner.cardMeta.maxAdventureCompletion ?: -1
-                        PotentialTransformation(
-                            transformationBitmaps = firmware.transformationBitmaps,
-                            bemCharacter = partner,
-                            transformationOption = potentialOption,
-                            expectedTransformation = currentOption == potentialOption,
-                            locked = (potentialOption.requiredAdventureCompleted ?: -1) > highestCompletedAdventure
-                        )
+            // Keep the data laid out within the VB display rectangle, centered, so nothing
+            // is clipped by the round bezel. Background stays full screen.
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+                Box(modifier = Modifier.width(vbWidth).fillMaxHeight()) {
+                    VerticalPager(state = pagerState) {rootPage ->
+                        when(rootPage) {
+                            0 -> {
+                                PartnerStats(initialPage = initialStatsPage, partner = partner)
+                            }
+                            else -> {
+                                val potentialOption = partner.transformationOptions[rootPage - 1]
+                                val highestCompletedAdventure = partner.cardMeta.maxAdventureCompletion ?: -1
+                                PotentialTransformation(
+                                    transformationBitmaps = firmware.transformationBitmaps,
+                                    bemCharacter = partner,
+                                    transformationOption = potentialOption,
+                                    expectedTransformation = currentOption == potentialOption,
+                                    locked = (potentialOption.requiredAdventureCompleted ?: -1) > highestCompletedAdventure
+                                )
+                            }
+                        }
                     }
                 }
             }

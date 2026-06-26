@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -38,11 +39,12 @@ fun PartnerScreen(controller: PartnerScreenController) {
     val emoteBitmaps by controller.emoteBitmaps.collectAsStateWithLifecycle()
     val vitals by controller.vitals.collectAsStateWithLifecycle()
     val emojiHeight = bitmapScaler.scaledDimension(firmware.emoteBitmaps.sweatEmote.height)
+    val vbWidth = bitmapScaler.scaledDimension(ImageScaler.VB_WIDTH.toInt())
     val now by remember {controller.getTimeFlow(coroutineScope)}.collectAsStateWithLifecycle()
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
         Column(verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
-            .fillMaxWidth()
+            .width(vbWidth)
             .offset(y = backgroundHeight.times(-.05f))) {
             Text(text="${formatNumber(now.hour, 2)}:${formatNumber(now.minute, 2)}", fontWeight = FontWeight.Bold, fontSize = 4.em)
             Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
