@@ -1,11 +1,8 @@
 package com.github.cfogrady.vitalwear.main
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
@@ -19,14 +16,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.em
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.wear.compose.material.Text
 import androidx.wear.tooling.preview.devices.WearDevices
-import com.github.cfogrady.vitalwear.R
 import com.github.cfogrady.vitalwear.character.PartnerScreen
 import com.github.cfogrady.vitalwear.main.MenuOption.ADVENTURE
 import com.github.cfogrady.vitalwear.main.MenuOption.BATTLE
@@ -112,39 +104,19 @@ fun MainScreen(controller: MainScreenController) {
                 }
                 TRANSFER -> {
                     vitalBoxFactory.VitalBox {
-                        Box(modifier = Modifier
-                            .fillMaxSize()
-                            .clickable {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            bitmapScaler.ScaledBitmap(bitmap = controller.menuBitmaps.connectIcon, contentDescription = "Transfer", modifier = Modifier.clickable {
                                 controller.launchTransferActivity()
-                            }, contentAlignment = Alignment.Center) {
-                            val menuIconSize = bitmapScaler.scaledDimension(controller.menuBitmaps.settingsIcon.width)
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.vbh_vw_app_icon),
-                                    contentDescription = "VBH-VW",
-                                    modifier = Modifier.size(menuIconSize)
-                                )
-                                Text(text = "TRANSFER",  fontWeight = FontWeight.Bold, fontSize = 3.em)
-                            }
+                            })
                         }
                     }
                 }
                 BATTLE -> {
                     vitalBoxFactory.VitalBox {
-                        Box(modifier = Modifier
-                            .fillMaxSize()
-                            .clickable {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            bitmapScaler.ScaledBitmap(bitmap = controller.menuBitmaps.battleIcon, contentDescription = "Battle", modifier = Modifier.clickable {
                                 controller.launchBattleActivity()
-                            }, contentAlignment = Alignment.Center) {
-                            val menuIconSize = bitmapScaler.scaledDimension(controller.menuBitmaps.settingsIcon.width)
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.fight_icon),
-                                    contentDescription = "Battle",
-                                    modifier = Modifier.size(menuIconSize)
-                                )
-                                Text(text = "BATTLE",  fontWeight = FontWeight.Bold, fontSize = 3.em)
-                            }
+                            })
                         }
                     }
                 }

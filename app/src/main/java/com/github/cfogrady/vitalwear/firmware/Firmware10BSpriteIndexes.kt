@@ -23,6 +23,7 @@ class Firmware10BSpriteIndexes {
             adventureMenuIcon = 266,
             statsIconIdx = 264,
             connectIcon = 268,
+            battleIcon = 83,
             stopIcon = 44,
             stopText = 169,
             settingsMenuIcon = 269,

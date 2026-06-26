@@ -10,6 +10,7 @@ data class MenuBitmaps(
     val stopText: Bitmap,
     val stopIcon: Bitmap,
     val connectIcon: Bitmap,
+    val battleIcon: Bitmap,
     val settingsIcon: Bitmap,
     val sleepIcon: Bitmap,
     val wakeIcon: Bitmap,
