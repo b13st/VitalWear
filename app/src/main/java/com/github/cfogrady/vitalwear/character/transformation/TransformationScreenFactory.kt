@@ -397,7 +397,7 @@ class TransformationScreenFactory(
                 onFinish.invoke()
             }, PRIMARY_DELAY*2)
         }
-        bitmapScaler.ScaledBitmap(bitmap = partner.characterSprites.sprites[CharacterSprites.SPLASH], contentDescription = "New Partner", alignment = Alignment.BottomCenter)
+        bitmapScaler.SplashBitmap(bitmap = partner.characterSprites.sprites[CharacterSprites.SPLASH], contentDescription = "New Partner", alignment = Alignment.BottomCenter)
     }
 
     @Composable
