@@ -6,6 +6,7 @@ data class MenuSpriteIndexes(
     val adventureMenuIcon: Int = 266,
     val statsIconIdx: Int = 264,
     val connectIcon: Int = 268,
+    val battleIcon: Int = 83,
     val stopIcon: Int = 44,
     val stopText: Int = 169,
     val settingsMenuIcon: Int = 269,

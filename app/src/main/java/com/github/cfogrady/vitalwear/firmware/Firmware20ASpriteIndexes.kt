@@ -22,6 +22,7 @@ class Firmware20ASpriteIndexes {
             adventureMenuIcon = 265,
             statsIconIdx = 263,
             connectIcon = 267,
+            battleIcon = 83,
             stopIcon = 44,
             stopText = 169,
             settingsMenuIcon = 268,

@@ -114,12 +114,13 @@ class FirmwareLoader(private val bemSpriteReader: BemSpriteReader, private val s
         val trainingMenuIcon = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.trainingMenuIcon])
         val adventureIcon = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.adventureMenuIcon])
         val connectMenuIcon = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.connectIcon])
+        val battleMenuIcon = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.battleIcon])
         val stopText = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.stopText])
         val stopIcon = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.stopIcon])
         val settingsIcon = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.settingsMenuIcon])
         val sleepIcon = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.sleep])
         val wakeIcon = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.wakeup])
-        return MenuBitmaps(statsMenuIcon, characterSelectorIcon, trainingMenuIcon, adventureIcon, stopText, stopIcon, connectMenuIcon, settingsIcon, sleepIcon, wakeIcon)
+        return MenuBitmaps(statsMenuIcon, characterSelectorIcon, trainingMenuIcon, adventureIcon, stopText, stopIcon, connectMenuIcon, battleMenuIcon, settingsIcon, sleepIcon, wakeIcon)
     }
 
     private fun buildAdventureBitmaps(adventureSpriteIndexes: AdventureSpriteIndexes, sprites: List<Sprite>): AdventureBitmaps {
