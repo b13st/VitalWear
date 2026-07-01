@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,8 +44,9 @@ fun ActiveTraining(
         bitmapScaler.ScaledBitmap(bitmap = firmware.trainingBitmaps.trainingState[spriteIdx], contentDescription = "level", modifier = Modifier.offset(y = backgroundHeight.times(.2f)))
     }
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
+        val vbWidth = bitmapScaler.scaledDimension(ImageScaler.VB_WIDTH.toInt())
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
-            .fillMaxWidth()
+            .width(vbWidth)
             .offset(
                 y = backgroundHeight.times(
                     PositionOffsetRatios.CHARACTER_OFFSET_FROM_BOTTOM
