@@ -3,22 +3,13 @@ package com.github.cfogrady.vitalwear.transfer.hce
 import android.nfc.cardemulation.HostApduService
 import android.os.Bundle
 import com.github.cfogrady.vitalwear.VitalWearApp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class VitalWearHostApduService : HostApduService() {
-    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private val repository: VitalWearHceTransferRepository by lazy {
         VitalWearHceTransferRepository(application as VitalWearApp)
-    }
-
-    override fun onDestroy() {
-        serviceScope.cancel()
-        super.onDestroy()
     }
 
     override fun processCommandApdu(commandApdu: ByteArray?, extras: Bundle?): ByteArray {
@@ -45,7 +36,8 @@ class VitalWearHostApduService : HostApduService() {
                 VitalWearHceProtocol.INS_COMMIT -> handleCommit()
                 else -> VitalWearHceProtocol.buildResponse(statusWord = VitalWearHceProtocol.SW_FUNC_NOT_SUPPORTED)
             }
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Timber.e(e, "HCE command 0x%02X failed", ins)
             VitalWearHceProtocol.buildResponse(statusWord = VitalWearHceProtocol.SW_INTERNAL_ERROR)
         }
     }
@@ -152,9 +144,15 @@ class VitalWearHostApduService : HostApduService() {
 
                 // Acknowledge COMMIT immediately so the phone-side IsoDep transceive does not time out.
                 VitalWearHceSessionManager.clear(resetStatus = false)
-                serviceScope.launch {
+                // Import on the application scope: this service is destroyed (and a service-local
+                // scope would be cancelled) as soon as the NFC field drops, which happens while
+                // the import is still running — the character would arrive but the transfer
+                // would be reported as failed.
+                (application as VitalWearApp).applicationScope.launch {
                     val importSuccess = runCatching {
                         repository.importCharacter(payload)
+                    }.onFailure {
+                        Timber.e(it, "Character import from HCE payload failed")
                     }.getOrDefault(false)
                     if (importSuccess) {
                         VitalWearHceSessionManager.markSuccess()

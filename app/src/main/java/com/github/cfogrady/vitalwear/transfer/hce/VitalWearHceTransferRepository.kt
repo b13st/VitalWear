@@ -15,6 +15,7 @@ import com.github.cfogrady.vitalwear.transfer.toProto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class VitalWearHceTransferRepository(
     private val app: VitalWearApp,
@@ -65,16 +66,23 @@ class VitalWearHceTransferRepository(
             importCharacter.settings.toCharacterSettings(),
             importCharacter.transformationHistoryList.toTransformationHistoryEntities()
         )
-        app.adventureService.addCharacterAdventures(characterId, importCharacter.maxAdventureCompletedByCardMap)
-        app.characterManager.swapToCharacter(
-            app.applicationContext,
-            CharacterManager.SwapCharacterIdentifier.buildAnonymous(
-                importCharacter.cardName,
-                characterId,
-                importCharacter.characterStats.slotId,
-                CharacterState.STORED,
+        // The character is persisted at this point, so the transfer itself has succeeded.
+        // Adventure completion and activating the character are best-effort extras: a failure
+        // there must not report the whole transfer as failed to the user.
+        runCatching {
+            app.adventureService.addCharacterAdventures(characterId, importCharacter.maxAdventureCompletedByCardMap)
+            app.characterManager.swapToCharacter(
+                app.applicationContext,
+                CharacterManager.SwapCharacterIdentifier.buildAnonymous(
+                    importCharacter.cardName,
+                    characterId,
+                    importCharacter.characterStats.slotId,
+                    CharacterState.STORED,
+                )
             )
-        )
+        }.onFailure {
+            Timber.e(it, "Imported character persisted but post-import steps failed")
+        }
 
         // Keep COMMIT fast on HCE: heavy sprite file checks can outlive NFC field and cause TagLost.
         return true

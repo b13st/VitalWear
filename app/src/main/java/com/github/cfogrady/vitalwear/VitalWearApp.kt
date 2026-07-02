@@ -68,11 +68,19 @@ import com.github.cfogrady.vitalwear.vitals.VitalService
 import com.github.cfogrady.vitalwear.workmanager.VitalWearWorkerFactory
 import com.github.cfogrady.vitalwear.workmanager.WorkProviderDependencies
 import com.google.common.collect.Lists
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import timber.log.Timber
 import java.util.Random
 
 class VitalWearApp : Application(), Configuration.Provider {
+
+    // Lives as long as the process. For work that must survive short-lived component
+    // lifecycles (e.g. the HCE service is destroyed as soon as the NFC field drops,
+    // which would cancel an in-flight character import).
+    val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private val spriteBitmapConverter = SpriteBitmapConverter()
     private val spriteFileIO = SpriteFileIO()
