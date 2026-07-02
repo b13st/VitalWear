@@ -22,9 +22,13 @@ class EndFightReactionFactory(private val bitmapScaler: BitmapScaler, private va
     fun EndFightReaction(battleResult: BattleResult, background: Bitmap, finished: () -> Unit) {
         val characterBitmaps = remember { characterBitmaps(battleResult) }
         val emoteBitmaps = remember { emoteBitmaps(battleResult) }
-        Handler(Looper.getMainLooper()!!).postDelayed({
-            finished.invoke()
-        }, 2000)
+        // In an effect so recompositions (e.g. the emote flashing below) don't
+        // schedule extra finished() calls.
+        LaunchedEffect(true) {
+            Handler(Looper.getMainLooper()!!).postDelayed({
+                finished.invoke()
+            }, 2000)
+        }
         val vbWidth = bitmapScaler.scaledDimension(ImageScaler.VB_WIDTH.toInt())
         bitmapScaler.FullScreenBackground(bitmap = background, contentDescription = "Background")
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
@@ -39,9 +43,11 @@ class EndFightReactionFactory(private val bitmapScaler: BitmapScaler, private va
                         )
                     } else {
                         var showEmote by remember { mutableStateOf(true) }
-                        Handler(Looper.getMainLooper()!!).postDelayed({
-                            showEmote = !showEmote
-                        }, 500)
+                        LaunchedEffect(showEmote) {
+                            Handler(Looper.getMainLooper()!!).postDelayed({
+                                showEmote = !showEmote
+                            }, 500)
+                        }
                         if(showEmote) {
                             bitmapScaler.ScaledBitmap(bitmap = emoteBitmaps[0], contentDescription = "Emote")
                         }

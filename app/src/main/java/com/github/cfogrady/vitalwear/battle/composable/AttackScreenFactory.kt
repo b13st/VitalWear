@@ -248,9 +248,13 @@ class AttackScreenFactory(val bitmapScaler: BitmapScaler, val backgroundHeight: 
                     .graphicsLayer(scaleX = direction)
             )
         }
-        Handler(Looper.getMainLooper()!!).postDelayed({
-            onFinish.invoke()
-        }, 800)
+        // In an effect because the jump animation recomposes constantly and would
+        // otherwise schedule an onFinish timer per frame.
+        LaunchedEffect(Unit) {
+            Handler(Looper.getMainLooper()!!).postDelayed({
+                onFinish.invoke()
+            }, 800)
+        }
     }
 
     @Composable
@@ -477,17 +481,21 @@ class AttackScreenFactory(val bitmapScaler: BitmapScaler, val backgroundHeight: 
                 }
 
             } else {
-                Handler(Looper.getMainLooper()!!).postDelayed({
-                    if(supportAttack == null) {
-                        onFinish.invoke()
-                    } else if (supportAttackLaunched) {
-                        onFinish.invoke()
-                    } else {
-                        attackHitting = false
-                        targetSupportAttackOffset = 0f
-                        supportAttackLaunched = true
-                    }
-                }, 1750)
+                // Keyed effect: the hit animation recomposes every frame and would
+                // otherwise stack a new 1750ms timer per recomposition.
+                LaunchedEffect(supportAttackLaunched) {
+                    Handler(Looper.getMainLooper()!!).postDelayed({
+                        if(supportAttack == null) {
+                            onFinish.invoke()
+                        } else if (supportAttackLaunched) {
+                            onFinish.invoke()
+                        } else {
+                            attackHitting = false
+                            targetSupportAttackOffset = 0f
+                            supportAttackLaunched = true
+                        }
+                    }, 1750)
+                }
                 bitmapScaler.AnimatedScaledBitmap(
                     bitmaps = hitSprites,
                     startIdx = 0,

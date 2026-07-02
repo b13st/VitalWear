@@ -347,25 +347,28 @@ class TransformationScreenFactory(
         var characterSprite by remember { mutableStateOf(partner.characterSprites.sprites[CharacterSprites.IDLE_1]) }
         var pulseSprite by remember { mutableStateOf(transformationBitmaps.weakPulse) }
         var iterations by remember { mutableStateOf(0) }
-        Handler(Looper.getMainLooper()!!).postDelayed({
-            iterations++
-            if (iterations % 2 == 0 && iterations < 12) {
-                characterSprite = partner.characterSprites.sprites[CharacterSprites.IDLE_1]
-                pulseSprite = transformationBitmaps.weakPulse
-            } else if (iterations < 11) {
-                characterSprite = partner.characterSprites.sprites[CharacterSprites.IDLE_2]
-                pulseSprite = transformationBitmaps.strongPulse
-            } else if (iterations == 11) {
-                characterSprite = if (partner.speciesStats.phase < 2) {
-                    partner.characterSprites.sprites[CharacterSprites.IDLE_2]
+        // Keyed effect so recompositions don't stack extra timers (same pattern as FusionIdle).
+        LaunchedEffect(iterations) {
+            Handler(Looper.getMainLooper()!!).postDelayed({
+                iterations++
+                if (iterations % 2 == 0 && iterations < 12) {
+                    characterSprite = partner.characterSprites.sprites[CharacterSprites.IDLE_1]
+                    pulseSprite = transformationBitmaps.weakPulse
+                } else if (iterations < 11) {
+                    characterSprite = partner.characterSprites.sprites[CharacterSprites.IDLE_2]
+                    pulseSprite = transformationBitmaps.strongPulse
+                } else if (iterations == 11) {
+                    characterSprite = if (partner.speciesStats.phase < 2) {
+                        partner.characterSprites.sprites[CharacterSprites.IDLE_2]
+                    } else {
+                        partner.characterSprites.sprites[CharacterSprites.ATTACK]
+                    }
+                    pulseSprite = transformationBitmaps.strongPulse
                 } else {
-                    partner.characterSprites.sprites[CharacterSprites.ATTACK]
+                    onFinish.invoke()
                 }
-                pulseSprite = transformationBitmaps.strongPulse
-            } else {
-                onFinish.invoke()
-            }
-        }, PRIMARY_DELAY)
+            }, PRIMARY_DELAY)
+        }
         bitmapScaler.FillHeightBitmap(bitmap = transformationBitmaps.blackBackground, contentDescription = "Background", alignment = Alignment.BottomCenter)
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
             Column(verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
@@ -381,12 +384,14 @@ class TransformationScreenFactory(
     fun NewCharacter(firmwareSprites: TransformationBitmaps, onFinish: () -> Unit) {
         // 4 full loops
         var iterations by remember { mutableStateOf(0) }
-        Handler(Looper.getMainLooper()!!).postDelayed({
-            iterations++
-            if(iterations > 11) {
-                onFinish.invoke()
-            }
-        }, PRIMARY_DELAY)
+        LaunchedEffect(iterations) {
+            Handler(Looper.getMainLooper()!!).postDelayed({
+                iterations++
+                if(iterations > 11) {
+                    onFinish.invoke()
+                }
+            }, PRIMARY_DELAY)
+        }
         bitmapScaler.FillHeightBitmap(bitmap = firmwareSprites.newBackgrounds[iterations % 3], contentDescription = "Background", alignment = Alignment.BottomCenter)
     }
 
@@ -409,21 +414,23 @@ class TransformationScreenFactory(
          */
         var iterations by remember { mutableStateOf(0) }
         var charaterSprite by remember { mutableStateOf(partner.characterSprites.sprites[CharacterSprites.IDLE_1])}
-        Handler(Looper.getMainLooper()!!).postDelayed({
-            iterations++
-            if (iterations > 5) {
-                onFinish.invoke()
-            } else if (iterations % 2 == 1) {
-                charaterSprite =
-                    if (partner.speciesStats.phase < 2) {
-                        partner.characterSprites.sprites[CharacterSprites.IDLE_2]
-                    } else {
-                        partner.characterSprites.sprites[CharacterSprites.ATTACK]
-                    }
-            } else  {
-                charaterSprite = partner.characterSprites.sprites[CharacterSprites.IDLE_1]
-            }
-        }, PRIMARY_DELAY)
+        LaunchedEffect(iterations) {
+            Handler(Looper.getMainLooper()!!).postDelayed({
+                iterations++
+                if (iterations > 5) {
+                    onFinish.invoke()
+                } else if (iterations % 2 == 1) {
+                    charaterSprite =
+                        if (partner.speciesStats.phase < 2) {
+                            partner.characterSprites.sprites[CharacterSprites.IDLE_2]
+                        } else {
+                            partner.characterSprites.sprites[CharacterSprites.ATTACK]
+                        }
+                } else  {
+                    charaterSprite = partner.characterSprites.sprites[CharacterSprites.IDLE_1]
+                }
+            }, PRIMARY_DELAY)
+        }
         bitmapScaler.FillHeightBitmap(bitmap = firmwareSprites.rayOfLightBackground, contentDescription = "Background", alignment = Alignment.BottomCenter)
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
             bitmapScaler.ScaledBitmap(bitmap = charaterSprite, contentDescription = "Character", alignment = Alignment.BottomCenter, modifier = Modifier.offset(y = backgroundHeight.times(-.05f)))

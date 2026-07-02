@@ -116,12 +116,15 @@ class TrainingScreenFactory(private val vitalBoxFactory: VitalBoxFactory,
     @Composable
     private fun Ready(firmware: Firmware, finished: () -> Unit) {
         var countDown by remember { mutableStateOf(3) }
-        Handler(Looper.getMainLooper()!!).postDelayed({
-            countDown -= 1
-            if(countDown == 0) {
-                finished.invoke()
-            }
-        }, 1000)
+        // Keyed effect so recompositions don't stack extra timers and skip countdown numbers.
+        LaunchedEffect(countDown) {
+            Handler(Looper.getMainLooper()!!).postDelayed({
+                countDown -= 1
+                if(countDown == 0) {
+                    finished.invoke()
+                }
+            }, 1000)
+        }
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
             bitmapScaler.ScaledBitmap(bitmap = firmware.readyIcon, contentDescription = "ready", modifier = Modifier.offset(y = backgroundHeight.times(.3f)))
         }
@@ -133,10 +136,10 @@ class TrainingScreenFactory(private val vitalBoxFactory: VitalBoxFactory,
     @Composable
     private fun Go(partner: VBCharacter, firmware: Firmware, finished:() -> Unit) {
         var charaterSprite by remember { mutableStateOf(partner.characterSprites.sprites[CharacterSprites.IDLE_1]) }
-        Handler(Looper.getMainLooper()!!).postDelayed({
-            charaterSprite = partner.characterSprites.sprites[CharacterSprites.WIN]
-        }, 500)
         LaunchedEffect(true) {
+            Handler(Looper.getMainLooper()!!).postDelayed({
+                charaterSprite = partner.characterSprites.sprites[CharacterSprites.WIN]
+            }, 500)
             Handler(Looper.getMainLooper()!!).postDelayed({
                 finished.invoke()
             }, 1000)
