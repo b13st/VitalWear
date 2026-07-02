@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
@@ -353,26 +355,34 @@ fun ZoneConfirm(controller: ZoneConfirmController, cardMetaEntity: CardMetaEntit
     } else {
         controller.vitalBoxFactory.VitalBox {
             bitmapScaler.FullScreenBackground(bitmap = backgrounds[adventureEntity.bossBackgroundId], contentDescription = "background")
-            Column(modifier = Modifier
+            val vbWidth = bitmapScaler.scaledDimension(ImageScaler.VB_WIDTH.toInt())
+            // Keep the data inside the VB rectangle and off the physical edges so the
+            // goal row and NEXT banner aren't clipped by the round bezel.
+            Box(modifier = Modifier
                 .fillMaxSize()
                 .clickable {
                     onConfirm.invoke()
-                }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceBetween) {
-                bitmapScaler.ScaledBitmap(bitmap = adventureFirmwareSprites.nextMissionImage, contentDescription = "Next text")
-                bitmapScaler.ScaledBitmap(bitmap = boss!!, contentDescription = "Next text")
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        bitmapScaler.ScaledBitmap(bitmap = adventureFirmwareSprites.stageImage, contentDescription = "stage text")
-                        Text(text = formatNumber(adventureEntity.adventureId+1, 2), fontSize = 3.em)
+                }, contentAlignment = Alignment.TopCenter) {
+                Column(modifier = Modifier
+                    .width(vbWidth)
+                    .fillMaxHeight()
+                    .padding(vertical = bitmapScaler.scaledDimension(6)), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceBetween) {
+                    bitmapScaler.ScaledBitmap(bitmap = adventureFirmwareSprites.nextMissionImage, contentDescription = "Next text")
+                    bitmapScaler.ScaledBitmap(bitmap = boss!!, contentDescription = "Next text")
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            bitmapScaler.ScaledBitmap(bitmap = adventureFirmwareSprites.stageImage, contentDescription = "stage text")
+                            Text(text = formatNumber(adventureEntity.adventureId+1, 2), fontSize = 3.em)
+                        }
+                        bitmapScaler.ScaledBitmap(bitmap = adventureFirmwareSprites.underlineImage, contentDescription = "separator")
                     }
-                    bitmapScaler.ScaledBitmap(bitmap = adventureFirmwareSprites.underlineImage, contentDescription = "separator")
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround, verticalAlignment = Alignment.CenterVertically) {
-                        bitmapScaler.ScaledBitmap(bitmap = adventureFirmwareSprites.flagImage, contentDescription = "goal")
-                        Text(text = "${adventureEntity.steps}", fontSize = 3.em)
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround, verticalAlignment = Alignment.CenterVertically) {
+                            bitmapScaler.ScaledBitmap(bitmap = adventureFirmwareSprites.flagImage, contentDescription = "goal")
+                            Text(text = "${adventureEntity.steps}", fontSize = 3.em)
+                        }
+                        bitmapScaler.ScaledBitmap(bitmap = adventureFirmwareSprites.underlineImage, contentDescription = "separator")
                     }
-                    bitmapScaler.ScaledBitmap(bitmap = adventureFirmwareSprites.underlineImage, contentDescription = "separator")
                 }
             }
         }
