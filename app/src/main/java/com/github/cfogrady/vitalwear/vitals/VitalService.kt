@@ -110,10 +110,14 @@ class VitalService(private val characterManager: CharacterManager, private val c
     )
 
     fun processVitalChangeFromBattle(partnerLevel: Int, opponentLevel: Int, win: Boolean): Int {
+        // Tables cover phases 3-8 (indexes 0-5); clamp so opponents outside that range
+        // (e.g. phase 1-2 DIM characters) don't index out of bounds.
+        val partnerIdx = (partnerLevel-2).coerceIn(0, vitalWinTable.size-1)
+        val opponentIdx = (opponentLevel-2).coerceIn(0, vitalWinTable[0].size-1)
         val vitalsChange = if(win) {
-            vitalWinTable[partnerLevel-2][opponentLevel-2]
+            vitalWinTable[partnerIdx][opponentIdx]
         } else {
-            vitalLossTable[partnerLevel-2][opponentLevel-2]
+            vitalLossTable[partnerIdx][opponentIdx]
         }
         addVitals("battle against level ${opponentLevel +1} opponent. Won: $win", characterManager.getCurrentCharacter()!!, vitalsChange)
         return vitalsChange
