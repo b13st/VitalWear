@@ -55,6 +55,9 @@ class Firmware20ASpriteIndexes {
             hitEndIdx = 349,
             vitalsRangeStartIdx = 276,
             vitalsRangeEndIdx = 283,
+            // Inferred from the constant -5 offset of the surrounding battle sprites
+            // relative to 10B (372 - 5); not verified against a 20A firmware dump.
+            fightTextIdx = 367,
         )
 
         val trainingSpriteIndexes = TrainingSpriteIndexes(

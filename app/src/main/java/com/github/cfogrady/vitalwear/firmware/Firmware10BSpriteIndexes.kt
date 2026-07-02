@@ -56,6 +56,7 @@ class Firmware10BSpriteIndexes {
             hitEndIdx = 354,
             vitalsRangeStartIdx = 281,
             vitalsRangeEndIdx = 288,
+            fightTextIdx = 372,
         )
 
         val trainingSpriteIndexes = TrainingSpriteIndexes(

@@ -60,7 +60,7 @@ class FirmwareLoader(private val bemSpriteReader: BemSpriteReader, private val s
 
         return Firmware(
             buildCharacterIconBitmaps(firmwareSpriteIndexes.characterIconSpriteIndexes, emoteBitmaps, sprites),
-            buildMenuBitmaps(firmwareSpriteIndexes.menuSpriteIndexes, sprites),
+            buildMenuBitmaps(firmwareSpriteIndexes.menuSpriteIndexes, sprites, sprites[firmwareSpriteIndexes.battleSpriteIndexes.fightTextIdx]),
             buildAdventureBitmaps(firmwareSpriteIndexes.adventureSpriteIndexes, sprites),
             battleBitmaps,
             buildTrainingBitmaps(firmwareSpriteIndexes.trainingSpriteIndexes, sprites),
@@ -109,7 +109,7 @@ class FirmwareLoader(private val bemSpriteReader: BemSpriteReader, private val s
         return CharacterIconBitmaps(stepsIcon, vitalsIcon, supportIcon, emoteBitmaps)
     }
 
-    private fun buildMenuBitmaps(menuSpriteIndexes: MenuSpriteIndexes, firmwareSprites: List<Sprite>): MenuBitmaps {
+    private fun buildMenuBitmaps(menuSpriteIndexes: MenuSpriteIndexes, firmwareSprites: List<Sprite>, fightTextSprite: Sprite): MenuBitmaps {
         val statsMenuIcon = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.statsIconIdx])
         val characterSelectorIcon = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.characterSelectorIcon])
         val trainingMenuIcon = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.trainingMenuIcon])
@@ -119,12 +119,25 @@ class FirmwareLoader(private val bemSpriteReader: BemSpriteReader, private val s
         // original device), so the 16x16 battles icon is tripled to match the pictogram size
         // of the other 80x80 menu icons.
         val battleMenuIcon = scaledSpriteBitmap(firmwareSprites[menuSpriteIndexes.battleIcon], 3)
+        // The firmware's yellow FIGHT! text recolored to the menu's label white, so the
+        // battle entry gets a pixel-font label like the ones baked into the other menu sprites.
+        val battleText = whiteRecoloredBitmap(fightTextSprite)
         val stopText = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.stopText])
         val stopIcon = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.stopIcon])
         val settingsIcon = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.settingsMenuIcon])
         val sleepIcon = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.sleep])
         val wakeIcon = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.wakeup])
-        return MenuBitmaps(statsMenuIcon, characterSelectorIcon, trainingMenuIcon, adventureIcon, stopText, stopIcon, connectMenuIcon, battleMenuIcon, settingsIcon, sleepIcon, wakeIcon)
+        return MenuBitmaps(statsMenuIcon, characterSelectorIcon, trainingMenuIcon, adventureIcon, stopText, stopIcon, connectMenuIcon, battleMenuIcon, battleText, settingsIcon, sleepIcon, wakeIcon)
+    }
+
+    private fun whiteRecoloredBitmap(sprite: Sprite): Bitmap {
+        val pixels = spriteBitmapConverter.createARGBIntArray(sprite)
+        for (i in pixels.indices) {
+            if (pixels[i] ushr 24 != 0) {
+                pixels[i] = 0xFFFFFFFF.toInt()
+            }
+        }
+        return Bitmap.createBitmap(pixels, sprite.width, sprite.height, Bitmap.Config.HARDWARE)
     }
 
     // Integer nearest-neighbor upscale done on the pixel array because the converter

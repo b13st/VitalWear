@@ -15,5 +15,6 @@ data class BattleSpriteIndexes(
     val hitEndIdx: Int,
     val vitalsRangeStartIdx: Int,
     val vitalsRangeEndIdx: Int,
+    val fightTextIdx: Int,
 ) {
 }
