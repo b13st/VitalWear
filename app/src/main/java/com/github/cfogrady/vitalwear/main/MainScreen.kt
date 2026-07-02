@@ -2,7 +2,9 @@ package com.github.cfogrady.vitalwear.main
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
@@ -16,8 +18,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.em
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.wear.compose.material.Text
 import androidx.wear.tooling.preview.devices.WearDevices
 import com.github.cfogrady.vitalwear.character.PartnerScreen
 import com.github.cfogrady.vitalwear.main.MenuOption.ADVENTURE
@@ -113,10 +119,23 @@ fun MainScreen(controller: MainScreenController) {
                 }
                 BATTLE -> {
                     vitalBoxFactory.VitalBox {
-                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            bitmapScaler.ScaledBitmap(bitmap = controller.menuBitmaps.battleIcon, contentDescription = "Battle", modifier = Modifier.clickable {
+                        Box(modifier = Modifier
+                            .fillMaxSize()
+                            .clickable {
                                 controller.launchBattleActivity()
-                            })
+                            }, contentAlignment = Alignment.Center) {
+                            // Icon plus label composed to match the style of the firmware's
+                            // 80x80 menu sprites, which bake a bold italic label under the icon.
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                bitmapScaler.ScaledBitmap(bitmap = controller.menuBitmaps.battleIcon, contentDescription = "Battle")
+                                Text(
+                                    text = "BATTLE",
+                                    fontWeight = FontWeight.Bold,
+                                    fontStyle = FontStyle.Italic,
+                                    fontSize = 3.em,
+                                    modifier = Modifier.padding(top = bitmapScaler.scaledDimension(3))
+                                )
+                            }
                         }
                     }
                 }

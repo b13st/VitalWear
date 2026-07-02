@@ -1,5 +1,6 @@
 package com.github.cfogrady.vitalwear.firmware
 
+import android.graphics.Bitmap
 import com.github.cfogrady.vb.dim.sprite.BemSpriteReader
 import com.github.cfogrady.vb.dim.sprite.SpriteData.Sprite
 import com.github.cfogrady.vb.dim.util.ByteUtils
@@ -114,13 +115,30 @@ class FirmwareLoader(private val bemSpriteReader: BemSpriteReader, private val s
         val trainingMenuIcon = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.trainingMenuIcon])
         val adventureIcon = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.adventureMenuIcon])
         val connectMenuIcon = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.connectIcon])
-        val battleMenuIcon = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.battleIcon])
+        // The firmware has no dedicated battle menu sprite (battles lived under CONNECT on the
+        // original device), so the 16x16 battles icon is tripled to match the pictogram size
+        // of the other 80x80 menu icons.
+        val battleMenuIcon = scaledSpriteBitmap(firmwareSprites[menuSpriteIndexes.battleIcon], 3)
         val stopText = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.stopText])
         val stopIcon = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.stopIcon])
         val settingsIcon = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.settingsMenuIcon])
         val sleepIcon = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.sleep])
         val wakeIcon = spriteBitmapConverter.getBitmap(firmwareSprites[menuSpriteIndexes.wakeup])
         return MenuBitmaps(statsMenuIcon, characterSelectorIcon, trainingMenuIcon, adventureIcon, stopText, stopIcon, connectMenuIcon, battleMenuIcon, settingsIcon, sleepIcon, wakeIcon)
+    }
+
+    // Integer nearest-neighbor upscale done on the pixel array because the converter
+    // produces HARDWARE bitmaps, which can't be redrawn through a software canvas.
+    private fun scaledSpriteBitmap(sprite: Sprite, factor: Int): Bitmap {
+        val pixels = spriteBitmapConverter.createARGBIntArray(sprite)
+        val scaledWidth = sprite.width * factor
+        val scaledHeight = sprite.height * factor
+        val scaledPixels = IntArray(scaledWidth * scaledHeight) { i ->
+            val x = (i % scaledWidth) / factor
+            val y = (i / scaledWidth) / factor
+            pixels[y * sprite.width + x]
+        }
+        return Bitmap.createBitmap(scaledPixels, scaledWidth, scaledHeight, Bitmap.Config.HARDWARE)
     }
 
     private fun buildAdventureBitmaps(adventureSpriteIndexes: AdventureSpriteIndexes, sprites: List<Sprite>): AdventureBitmaps {
