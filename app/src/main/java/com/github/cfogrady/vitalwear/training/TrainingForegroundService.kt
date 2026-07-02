@@ -18,7 +18,7 @@ import timber.log.Timber
 class TrainingForegroundService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? {
-        TODO("Not yet implemented")
+        return null
     }
 
     private lateinit var trainingService: TrainingService
