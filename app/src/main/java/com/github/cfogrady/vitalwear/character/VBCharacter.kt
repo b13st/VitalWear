@@ -180,7 +180,7 @@ abstract class VBCharacter(
 
     open fun increaseStatsFromMultipleTrainings(backgroundTrainingResults: BackgroundTrainingResults): TrainingStatChanges {
         if(!canIncreaseStats()) {
-            TrainingStatChanges(backgroundTrainingResults.trainingType.affectedStat, 0)
+            return TrainingStatChanges(backgroundTrainingResults.trainingType.affectedStat, 0)
         }
         val trainingType = backgroundTrainingResults.trainingType
         val standardStatIncrease = trainingType.standardTrainingIncrease
