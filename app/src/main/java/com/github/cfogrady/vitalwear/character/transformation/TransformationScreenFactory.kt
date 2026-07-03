@@ -142,17 +142,15 @@ class TransformationScreenFactory(
                                 finishOnce.invoke()
                             }
                         } else {
+                            // Advance automatically once the animation completes; tapping only
+                            // skips ahead. Gating this on a tap left the screen stuck forever.
                             FusionPair(context, character, fusionTransformation, transformationBitmaps) {
-                                if (evolutionConfirmed) {
-                                    transformationProgress = TransformationState.NEW_CHARACTER
-                                }
+                                transformationProgress = TransformationState.NEW_CHARACTER
                              }
                         }
                     }
                     TransformationState.POWER_INCREASING -> PowerIncreasing(character, transformationBitmaps) {
-                        if (evolutionConfirmed) {
-                            transformationProgress = TransformationState.NEW_CHARACTER
-                        }
+                        transformationProgress = TransformationState.NEW_CHARACTER
                     }
                     TransformationState.NEW_CHARACTER -> NewCharacter(
                         firmwareSprites = transformationBitmaps
@@ -400,7 +398,7 @@ class TransformationScreenFactory(
         LaunchedEffect(key1 = true) {
             Handler(Looper.getMainLooper()!!).postDelayed({
                 onFinish.invoke()
-            }, PRIMARY_DELAY*2)
+            }, PRIMARY_DELAY*5)
         }
         bitmapScaler.FillHeightBitmap(bitmap = partner.characterSprites.sprites[CharacterSprites.SPLASH], contentDescription = "New Partner", alignment = Alignment.BottomCenter)
     }
