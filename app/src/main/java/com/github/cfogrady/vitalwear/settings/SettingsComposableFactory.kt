@@ -98,6 +98,37 @@ class SettingsComposableFactory(private val backgroundManager: BackgroundManager
                             }
                         }
                     }
+                    SettingsMenuOption.BackgroundMode -> {
+                        val displayMode by backgroundManager.backgroundDisplayMode.collectAsState()
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                        ) {
+                            Text(text = "BACKGROUND", fontSize = 2.1.em, fontWeight = FontWeight.Bold)
+                            Text(text = "MODE", fontSize = 2.1.em, fontWeight = FontWeight.Bold)
+                            val radioScale = .5f
+                            val fontSize = 1.7.em
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                                .padding(0.dp, 10.dp, 0.dp, 0.dp)
+                                .clickable {
+                                    backgroundManager.setBackgroundDisplayMode(BackgroundManager.BackgroundDisplayMode.Fullscreen)
+                                }) {
+                                RadioButton(selected = displayMode == BackgroundManager.BackgroundDisplayMode.Fullscreen,
+                                    modifier = Modifier.scale(radioScale))
+                                Text(text = "Full Screen", fontSize = fontSize)
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                                .padding(0.dp, 5.dp, 0.dp, 0.dp)
+                                .clickable {
+                                    backgroundManager.setBackgroundDisplayMode(BackgroundManager.BackgroundDisplayMode.OriginalRatio)
+                                }) {
+                                RadioButton(selected = displayMode == BackgroundManager.BackgroundDisplayMode.OriginalRatio,
+                                    modifier = Modifier.scale(radioScale))
+                                Text(text = "Original VB Ratio", fontSize = fontSize)
+                            }
+                        }
+                    }
                     SettingsMenuOption.ToggleLogging -> {
                         var loggingEnabled by remember { mutableStateOf(logSettings.loggingEnabled()) }
                         val text = if(loggingEnabled) "DISABLE\nLOGS" else "ENABLE\nLOGS"
@@ -136,6 +167,7 @@ class SettingsComposableFactory(private val backgroundManager: BackgroundManager
     enum class SettingsMenuOption {
         Background,
         BattleBackground,
+        BackgroundMode,
         ToggleLogging,
         Save
     }
@@ -143,6 +175,7 @@ class SettingsComposableFactory(private val backgroundManager: BackgroundManager
     fun buildSettingMenuPages(): List<SettingsMenuOption> {
         return listOf(SettingsMenuOption.Background,
             SettingsMenuOption.BattleBackground,
+            SettingsMenuOption.BackgroundMode,
             SettingsMenuOption.ToggleLogging,
             SettingsMenuOption.Save)
     }

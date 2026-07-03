@@ -6,23 +6,28 @@ import android.graphics.BitmapFactory
 import android.os.Handler
 import android.os.Looper
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.wear.tooling.preview.devices.WearDevices
+import com.github.cfogrady.vitalwear.background.BackgroundManager
+import kotlinx.coroutines.flow.StateFlow
 
 class BitmapScaler(val imageScaler: ImageScaler) {
     companion object {
@@ -33,6 +38,10 @@ class BitmapScaler(val imageScaler: ImageScaler) {
             return BitmapScaler(ImageScaler.getContextImageScaler(context))
         }
     }
+
+    // Wired at app startup from BackgroundManager. Null (previews/tests) falls back
+    // to the legacy fullscreen-stretch behavior.
+    var backgroundDisplayModeFlow: StateFlow<BackgroundManager.BackgroundDisplayMode>? = null
 
     @Composable
     fun ScaledBitmap(
@@ -81,11 +90,27 @@ class BitmapScaler(val imageScaler: ImageScaler) {
         contentDescription: String = "Background",
         modifier: Modifier = Modifier,
     ) {
-        com.github.cfogrady.vitalwear.composable.util.FullScreenBackground(
-            bitmap = bitmap,
-            contentDescription = contentDescription,
-            modifier = modifier,
-        )
+        val displayMode = backgroundDisplayModeFlow?.collectAsState()?.value
+            ?: BackgroundManager.BackgroundDisplayMode.Fullscreen
+        if (displayMode == BackgroundManager.BackgroundDisplayMode.OriginalRatio) {
+            // Original Vital Bracelet look: keep the 1:2 sprite ratio, centered,
+            // with black bars filling the rest of the round screen.
+            Box(modifier = modifier.fillMaxSize().background(Color.Black)) {
+                Image(
+                    bitmap = bitmap.asImageBitmap(),
+                    contentDescription = contentDescription,
+                    modifier = Modifier.fillMaxSize(),
+                    alignment = Alignment.Center,
+                    contentScale = ContentScale.Fit,
+                )
+            }
+        } else {
+            com.github.cfogrady.vitalwear.composable.util.FullScreenBackground(
+                bitmap = bitmap,
+                contentDescription = contentDescription,
+                modifier = modifier,
+            )
+        }
     }
 
     /**

@@ -196,6 +196,7 @@ class VitalWearApp : Application(), Configuration.Provider {
         imageScaler = ImageScaler(applicationContext.resources.displayMetrics, applicationContext.resources.configuration.isScreenRound)
         backgroundHeight = imageScaler.calculateBackgroundHeight()
         bitmapScaler = BitmapScaler(imageScaler)
+        bitmapScaler.backgroundDisplayModeFlow = backgroundManager.backgroundDisplayMode
         scrollingNameFactory = ScrollingNameFactory(backgroundHeight, bitmapScaler)
         vitalBoxFactory = VitalBoxFactory(
             imageScaler = imageScaler,

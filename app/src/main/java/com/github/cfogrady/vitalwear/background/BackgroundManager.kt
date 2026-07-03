@@ -19,6 +19,14 @@ class BackgroundManager(private val cardSpritesIO: CardSpritesIO, private val sh
         const val STATIC_BATTLE_BACKGROUND_IS_CARD = "STATIC_BATTLE_BACKGROUND_IS_CARD"
         const val STATIC_BATTLE_BACKGROUND_CARD_NAME = "STATIC_BATTLE_BACKGROUND_CARD_NAME"
         const val STATIC_BATTLE_BACKGROUND_IDX = "STATIC_BATTLE_BACKGROUND_IDX"
+        const val BACKGROUND_DISPLAY_MODE = "BACKGROUND_DISPLAY_MODE"
+    }
+
+    // How backgrounds are drawn on screen: stretched to fill the whole display (legacy
+    // behavior) or kept at the original Vital Bracelet 1:2 ratio with black side bars.
+    enum class BackgroundDisplayMode {
+        Fullscreen,
+        OriginalRatio,
     }
 
     enum class BackgroundType(val isCardKey: String, val cardNameKey: String, val idxKey: String) {
@@ -43,6 +51,9 @@ class BackgroundManager(private val cardSpritesIO: CardSpritesIO, private val sh
     // static battle background when set
     private val _staticBattleBackground = MutableStateFlow<Bitmap?>(null)
     val staticBattleBackground: StateFlow<Bitmap?> = _staticBattleBackground
+
+    private val _backgroundDisplayMode = MutableStateFlow(BackgroundDisplayMode.Fullscreen)
+    val backgroundDisplayMode: StateFlow<BackgroundDisplayMode> = _backgroundDisplayMode
     lateinit var firmware: Firmware
 
     fun loadBackgrounds(context: Context, firmware: Firmware) {
@@ -62,7 +73,18 @@ class BackgroundManager(private val cardSpritesIO: CardSpritesIO, private val sh
                 _staticBattleBackground.value = it
             }
         }
+        val configuredDisplayMode = sharedPreferences.getString(BACKGROUND_DISPLAY_MODE, BackgroundDisplayMode.Fullscreen.name)
+        _backgroundDisplayMode.value = try {
+            BackgroundDisplayMode.valueOf(configuredDisplayMode ?: BackgroundDisplayMode.Fullscreen.name)
+        } catch (e: IllegalArgumentException) {
+            Timber.w(e, "Invalid background display mode preference, defaulting to Fullscreen")
+            BackgroundDisplayMode.Fullscreen
+        }
+    }
 
+    fun setBackgroundDisplayMode(mode: BackgroundDisplayMode) {
+        _backgroundDisplayMode.value = mode
+        sharedPreferences.edit().putString(BACKGROUND_DISPLAY_MODE, mode.name).apply()
     }
 
     private fun loadBackground(context: Context, isCardStringKey: String, indexKey: String, cardNameKey: String, backgroundSetter: (Bitmap) -> Unit) {
