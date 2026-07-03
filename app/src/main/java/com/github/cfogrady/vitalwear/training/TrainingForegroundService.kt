@@ -11,6 +11,7 @@ import android.os.Looper
 import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
+import com.github.cfogrady.vitalwear.R
 import com.github.cfogrady.vitalwear.VitalWearApp
 import com.github.cfogrady.vitalwear.notification.NotificationChannelManager
 import timber.log.Timber
@@ -32,7 +33,8 @@ class TrainingForegroundService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val notificationBuilder = NotificationCompat.Builder(this, NotificationChannelManager.CHANNEL_ID)
-            .setContentTitle("VitalWear Training")
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle("Training in progress")
         if (android.os.Build.VERSION.SDK_INT >= 34) {
             notificationBuilder.setCategory(Notification.CATEGORY_WORKOUT)
                 .setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)

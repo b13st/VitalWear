@@ -25,7 +25,7 @@ class VBTransformationWorker (
             CoroutineScope(Dispatchers.IO).launch {
                 character.prepCharacterTransformation(characterManager.fetchSupportCharacter(context))
                 if(character.readyToTransform.value != null) {
-                    notificationChannelManager.sendGenericNotification(context, "Transformation!", "Character is ready for transformation", NotificationChannelManager.TRANSFORMATION_READY_ID)
+                    notificationChannelManager.sendGenericNotification(context, "★ TRANSFORMATION ★", "Your partner is ready to transform!", NotificationChannelManager.TRANSFORMATION_READY_ID)
                 } else {
                     bemUpdater.setupTransformationChecker(character)
                 }

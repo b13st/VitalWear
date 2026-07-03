@@ -116,7 +116,7 @@ class AdventureService(
     }
 
     fun notifyZoneCompletion(context: Context) {
-        notificationChannelManager.sendGenericNotification(context, "Adventure Boss!", "", NotificationChannelManager.ADVENTURE_BOSS)
+        notificationChannelManager.sendGenericNotification(context, "Boss Ahead!", "Your partner reached the boss. Tap to fight!", NotificationChannelManager.ADVENTURE_BOSS)
     }
 
     suspend fun getAdventureOptions(cardName: String): List<AdventureEntity> {

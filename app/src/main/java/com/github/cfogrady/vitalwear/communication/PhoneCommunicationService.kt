@@ -52,10 +52,10 @@ class PhoneCommunicationService  : WearableListenerService() {
                     val result = cardReceiver.importCardFromChannel(applicationContext, channel)
                     val notificationChannelManager = (application as VitalWearApp).notificationChannelManager
                     if(result.success) {
-                        notificationChannelManager.sendGenericNotification(applicationContext, "${result.cardName} Import Successful", "")
+                        notificationChannelManager.sendGenericNotification(applicationContext, "${result.cardName} imported!", "")
                     } else {
                         val notificationCardName = result.cardName ?: "Card"
-                        notificationChannelManager.sendGenericNotification(applicationContext, "$notificationCardName Import Failed", "")
+                        notificationChannelManager.sendGenericNotification(applicationContext, "Couldn't import $notificationCardName", "")
                     }
                 }
             }

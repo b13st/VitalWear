@@ -7,6 +7,7 @@ import android.content.pm.ServiceInfo
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
+import com.github.cfogrady.vitalwear.R
 import com.github.cfogrady.vitalwear.VitalWearApp
 import com.github.cfogrady.vitalwear.notification.NotificationChannelManager
 import timber.log.Timber
@@ -39,7 +40,8 @@ class AdventureForegroundService : Service() {
         val startingAdventure = intent.extras?.getInt(STARTING_ADVENTURE)!!
         adventureService.startAdventure(this, cardName, startingAdventure)
         val notificationBuilder = NotificationCompat.Builder(this, NotificationChannelManager.CHANNEL_ID)
-            .setContentTitle("VitalWear Adventure")
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle("Adventure in progress")
         if (android.os.Build.VERSION.SDK_INT >= 34) {
             notificationBuilder.setCategory(Notification.CATEGORY_WORKOUT)
                 .setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)

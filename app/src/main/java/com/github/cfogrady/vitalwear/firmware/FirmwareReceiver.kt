@@ -77,13 +77,13 @@ class FirmwareReceiver(private val firmwareManager: FirmwareManager, private val
                 _firmwareImportProgress.value = 100
                 _firmwareUpdates.value++
                 Timber.i("Firmware fully received")
+                // Single completion notification; a second generic one was redundant.
                 notificationChannelManager.sendProgressNotification(
                     context,
-                    "Firmware Import Complete",
+                    "Firmware installed",
                     100,
                     NotificationChannelManager.FIRMWARE_IMPORT_PROGRESS_ID,
                 )
-                notificationChannelManager.sendGenericNotification(context, "New Firmware Loaded", "")
             } catch (e: Exception) {
                 Timber.e(e, "Failed to import firmware from phone")
                 _firmwareImportProgress.value = 0
