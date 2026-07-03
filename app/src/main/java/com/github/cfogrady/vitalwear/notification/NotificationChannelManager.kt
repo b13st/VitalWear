@@ -41,7 +41,7 @@ class NotificationChannelManager(private val notificationManager: NotificationMa
         val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.complication_preview)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setContentText(content)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -58,7 +58,7 @@ class NotificationChannelManager(private val notificationManager: NotificationMa
         val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         val boundedPercent = percent.coerceIn(0, 100)
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.complication_preview)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setContentText("$boundedPercent%")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
