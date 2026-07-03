@@ -173,7 +173,9 @@ class StatsMenuActivity : ComponentActivity() {
 
     @Composable
     private fun PotentialTransformation(transformationBitmaps: TransformationBitmaps, bemCharacter: VBCharacter, transformationOption: TransformationOption, expectedTransformation: Boolean, locked: Boolean) {
-        Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top) {
+        // Centered vertically so the NEXT banner and requirement rows sit in the widest part
+        // of the round screen instead of hugging the clipped top edge.
+        Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
             Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
                 if(expectedTransformation) {
                     bitmapScaler.ScaledBitmap(bitmap = transformationBitmaps.star, contentDescription = "star")
