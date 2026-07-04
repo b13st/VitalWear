@@ -29,6 +29,8 @@ import androidx.wear.compose.material.Text
 import com.github.cfogrady.vitalwear.background.BackgroundManager
 import com.github.cfogrady.vitalwear.SaveService
 import com.github.cfogrady.vitalwear.background.BackgroundSelectionActivity
+import com.github.cfogrady.vitalwear.character.SleepService
+import com.github.cfogrady.vitalwear.common.composable.util.formatNumber
 import com.github.cfogrady.vitalwear.composable.util.BitmapScaler
 import com.github.cfogrady.vitalwear.composable.util.VitalBoxFactory
 import com.github.cfogrady.vitalwear.log.LogSettings
@@ -37,7 +39,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class SettingsComposableFactory(private val backgroundManager: BackgroundManager, private val vitalBoxFactory: VitalBoxFactory, private val bitmapScaler: BitmapScaler, private val logSettings: LogSettings, private val saveService: SaveService) {
+class SettingsComposableFactory(private val backgroundManager: BackgroundManager, private val vitalBoxFactory: VitalBoxFactory, private val bitmapScaler: BitmapScaler, private val logSettings: LogSettings, private val saveService: SaveService, private val sleepService: SleepService) {
 
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
@@ -129,6 +131,31 @@ class SettingsComposableFactory(private val backgroundManager: BackgroundManager
                             }
                         }
                     }
+                    SettingsMenuOption.SleepSchedule -> {
+                        val autoSleepEnabled by sleepService.autoSleepEnabled.collectAsState()
+                        val bedHour by sleepService.bedHour.collectAsState()
+                        val wakeHour by sleepService.wakeHour.collectAsState()
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                        ) {
+                            Text(text = "SLEEP", fontSize = 2.1.em, fontWeight = FontWeight.Bold)
+                            Text(text = "SCHEDULE", fontSize = 2.1.em, fontWeight = FontWeight.Bold)
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                                .padding(0.dp, 10.dp, 0.dp, 0.dp)
+                                .clickable {
+                                    sleepService.setAutoSleepEnabled(!autoSleepEnabled)
+                                }) {
+                                RadioButton(selected = autoSleepEnabled, modifier = Modifier.scale(.5f))
+                                Text(text = if (autoSleepEnabled) "Auto Sleep On" else "Auto Sleep Off", fontSize = 1.7.em)
+                            }
+                            if (autoSleepEnabled) {
+                                HourSettingRow(label = "Bed", hour = bedHour) { sleepService.setBedHour(it) }
+                                HourSettingRow(label = "Wake", hour = wakeHour) { sleepService.setWakeHour(it) }
+                            }
+                        }
+                    }
                     SettingsMenuOption.ToggleLogging -> {
                         var loggingEnabled by remember { mutableStateOf(logSettings.loggingEnabled()) }
                         val text = if(loggingEnabled) "DISABLE\nLOGS" else "ENABLE\nLOGS"
@@ -156,6 +183,19 @@ class SettingsComposableFactory(private val backgroundManager: BackgroundManager
     }
 
     @Composable
+    private fun HourSettingRow(label: String, hour: Int, onChange: (Int) -> Unit) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(0.dp, 5.dp, 0.dp, 0.dp)) {
+            Text(text = "-", fontSize = 2.5.em, fontWeight = FontWeight.Bold, modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .clickable { onChange(hour - 1) })
+            Text(text = "$label ${formatNumber(hour, 2)}:00", fontSize = 1.7.em)
+            Text(text = "+", fontSize = 2.5.em, fontWeight = FontWeight.Bold, modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .clickable { onChange(hour + 1) })
+        }
+    }
+
+    @Composable
     private fun SettingsPageContainer(modifier: Modifier = Modifier, content: @Composable BoxScope.() -> Unit) {
         Box(
             modifier = modifier.fillMaxSize(),
@@ -168,6 +208,7 @@ class SettingsComposableFactory(private val backgroundManager: BackgroundManager
         Background,
         BattleBackground,
         BackgroundMode,
+        SleepSchedule,
         ToggleLogging,
         Save
     }
@@ -176,6 +217,7 @@ class SettingsComposableFactory(private val backgroundManager: BackgroundManager
         return listOf(SettingsMenuOption.Background,
             SettingsMenuOption.BattleBackground,
             SettingsMenuOption.BackgroundMode,
+            SettingsMenuOption.SleepSchedule,
             SettingsMenuOption.ToggleLogging,
             SettingsMenuOption.Save)
     }

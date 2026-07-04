@@ -45,7 +45,8 @@ interface MainScreenController {
                 characterManager = vitalWearApp.characterManager,
                 activityLaunchers = activityLaunchers,
                 saveService = vitalWearApp.saveService,
-                backgroundManager = vitalWearApp.backgroundManager
+                backgroundManager = vitalWearApp.backgroundManager,
+                sleepService = vitalWearApp.sleepService,
             )
         }
     }

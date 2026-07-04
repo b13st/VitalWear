@@ -5,6 +5,7 @@ import com.github.cfogrady.vitalwear.SaveService
 import com.github.cfogrady.vitalwear.background.BackgroundManager
 import com.github.cfogrady.vitalwear.character.CharacterManager
 import com.github.cfogrady.vitalwear.character.PartnerScreenController
+import com.github.cfogrady.vitalwear.character.SleepService
 import com.github.cfogrady.vitalwear.character.VBCharacter
 import com.github.cfogrady.vitalwear.character.transformation.ExpectedTransformation
 import com.github.cfogrady.vitalwear.composable.util.BitmapScaler
@@ -25,6 +26,7 @@ class MainScreenControllerImpl(
     private val activityLaunchers: ActivityLaunchers,
     private val saveService: SaveService,
     private val backgroundManager: BackgroundManager,
+    private val sleepService: SleepService,
 ) : MainScreenController {
     override val menuBitmaps: MenuBitmaps
         get() = firmwareManager.getFirmware().value!!.menuBitmaps
@@ -83,9 +85,6 @@ class MainScreenControllerImpl(
     }
 
     override fun toggleSleep() {
-        characterManager.getCurrentCharacter()?.let {
-            it.characterStats.sleeping = !it.characterStats.sleeping
-            saveService.saveAsync()
-        }
+        sleepService.toggleSleep()
     }
 }

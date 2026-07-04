@@ -27,6 +27,7 @@ import com.github.cfogrady.vitalwear.common.card.db.CardMetaEntityDao
 import com.github.cfogrady.vitalwear.character.VBUpdater
 import com.github.cfogrady.vitalwear.character.CharacterManager
 import com.github.cfogrady.vitalwear.character.CharacterManagerImpl
+import com.github.cfogrady.vitalwear.character.SleepService
 import com.github.cfogrady.vitalwear.character.data.PreviewCharacterManager
 import com.github.cfogrady.vitalwear.character.mood.MoodBroadcastReceiver
 import com.github.cfogrady.vitalwear.character.mood.MoodService
@@ -127,6 +128,7 @@ class VitalWearApp : Application(), Configuration.Provider {
     lateinit var characterReceiver: CharacterReceiver
     lateinit var moodService: MoodService
     lateinit var eventHaptics: EventHaptics
+    lateinit var sleepService: SleepService
     lateinit var settingsComposableFactory: SettingsComposableFactory
     private lateinit var applicationBootManager: ApplicationBootManager
     private lateinit var vbUpdater: VBUpdater
@@ -190,8 +192,9 @@ class VitalWearApp : Application(), Configuration.Provider {
         eventHaptics = EventHaptics(applicationContext) {
             characterManager.getCurrentCharacter()?.characterStats?.sleeping == true
         }
+        sleepService = SleepService(characterManager, saveService, sharedPreferences)
         moodService = MoodService(heartRateService, sensorManager, vbUpdater, characterManager, vitalService, saveService)
-        moodBroadcastReceiver = MoodBroadcastReceiver(moodService)
+        moodBroadcastReceiver = MoodBroadcastReceiver(moodService, sleepService)
 
         trainingService = TrainingService(sensorManager, heartRateService, saveService)
         shutdownManager = ShutdownManager(saveService)
@@ -230,7 +233,7 @@ class VitalWearApp : Application(), Configuration.Provider {
         cardReceiver = CardReceiver(cardLoader, notificationChannelManager)
         firmwareReceiver = FirmwareReceiver(firmwareManager, notificationChannelManager)
         characterReceiver = CharacterReceiver(characterManager, adventureService, cardMetaEntityDao, database.speciesEntityDao(), sharedTransferSeenDao)
-        settingsComposableFactory = SettingsComposableFactory(backgroundManager, vitalBoxFactory, bitmapScaler, logSettings, saveService)
+        settingsComposableFactory = SettingsComposableFactory(backgroundManager, vitalBoxFactory, bitmapScaler, logSettings, saveService, sleepService)
     }
 
     override val workManagerConfiguration: Configuration
