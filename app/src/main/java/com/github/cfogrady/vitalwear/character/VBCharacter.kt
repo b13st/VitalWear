@@ -236,6 +236,8 @@ abstract class VBCharacter(
     fun getEmoteBitmaps(firmware: EmoteBitmaps, exerciseLevel: Int): List<Bitmap?> {
         return if(characterStats.sleeping) {
             firmware.sleepEmote
+        } else if(characterStats.injured) {
+            firmware.injuredEmote
         } else if(exerciseLevel == 3) {
             listOf(firmware.sweatEmote, null)
         } else if (mood() == Mood.GOOD) {
