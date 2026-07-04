@@ -15,6 +15,7 @@ import com.github.cfogrady.vitalwear.common.card.db.AdventureEntityDao
 import com.github.cfogrady.vitalwear.common.card.db.CardMetaEntityDao
 import com.github.cfogrady.vitalwear.data.GameState
 import com.github.cfogrady.vitalwear.notification.NotificationChannelManager
+import com.github.cfogrady.vitalwear.util.EventHaptics
 import com.github.cfogrady.vitalwear.steps.AccelerometerToStepSensor
 import com.github.cfogrady.vitalwear.steps.StepSensorService
 import kotlinx.coroutines.CoroutineScope
@@ -36,7 +37,8 @@ class AdventureService(
     private val notificationChannelManager: NotificationChannelManager,
     private val characterAdventureDao: CharacterAdventureDao,
     private val stepService: StepSensorService,
-    private val sensorManager: SensorManager) {
+    private val sensorManager: SensorManager,
+    private val eventHaptics: EventHaptics) {
 
     var activeAdventure: ActiveAdventure? = null
     var accelerometerToStepSensor: AccelerometerToStepSensor? = null
@@ -116,6 +118,7 @@ class AdventureService(
     }
 
     fun notifyZoneCompletion(context: Context) {
+        eventHaptics.adventureBoss()
         notificationChannelManager.sendGenericNotification(context, "Boss Ahead!", "Your partner reached the boss. Tap to fight!", NotificationChannelManager.ADVENTURE_BOSS)
     }
 

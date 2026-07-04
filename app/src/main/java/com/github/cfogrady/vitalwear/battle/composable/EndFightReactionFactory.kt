@@ -15,9 +15,10 @@ import com.github.cfogrady.vitalwear.composable.util.BitmapScaler
 import com.github.cfogrady.vitalwear.composable.util.ImageScaler
 import com.github.cfogrady.vitalwear.composable.util.PositionOffsetRatios
 import com.github.cfogrady.vitalwear.firmware.FirmwareManager
+import com.github.cfogrady.vitalwear.util.EventHaptics
 import com.google.common.collect.Lists
 
-class EndFightReactionFactory(private val bitmapScaler: BitmapScaler, private val firmwareManager: FirmwareManager, private val characterManager: CharacterManager, private val backgroundHeight: Dp) {
+class EndFightReactionFactory(private val bitmapScaler: BitmapScaler, private val firmwareManager: FirmwareManager, private val characterManager: CharacterManager, private val backgroundHeight: Dp, private val eventHaptics: EventHaptics) {
     @Composable
     fun EndFightReaction(battleResult: BattleResult, background: Bitmap, finished: () -> Unit) {
         val characterBitmaps = remember { characterBitmaps(battleResult) }
@@ -25,6 +26,11 @@ class EndFightReactionFactory(private val bitmapScaler: BitmapScaler, private va
         // In an effect so recompositions (e.g. the emote flashing below) don't
         // schedule extra finished() calls.
         LaunchedEffect(true) {
+            when (battleResult) {
+                BattleResult.WIN -> eventHaptics.battleWon()
+                BattleResult.LOSE, BattleResult.INJURED -> eventHaptics.battleLost()
+                BattleResult.RETREAT -> {}
+            }
             Handler(Looper.getMainLooper()!!).postDelayed({
                 finished.invoke()
             }, 2000)

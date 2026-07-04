@@ -3,6 +3,7 @@ package com.github.cfogrady.vitalwear.character.transformation
 import android.content.Context
 import androidx.work.WorkerParameters
 import androidx.work.Worker
+import com.github.cfogrady.vitalwear.VitalWearApp
 import com.github.cfogrady.vitalwear.character.VBUpdater
 import com.github.cfogrady.vitalwear.character.CharacterManager
 import com.github.cfogrady.vitalwear.notification.NotificationChannelManager
@@ -25,6 +26,8 @@ class VBTransformationWorker (
             CoroutineScope(Dispatchers.IO).launch {
                 character.prepCharacterTransformation(characterManager.fetchSupportCharacter(context))
                 if(character.readyToTransform.value != null) {
+                    // Worker context is the application context, so this reaches the app singletons.
+                    (context.applicationContext as? VitalWearApp)?.eventHaptics?.transformationReady()
                     notificationChannelManager.sendGenericNotification(context, "★ TRANSFORMATION ★", "Your partner is ready to transform!", NotificationChannelManager.TRANSFORMATION_READY_ID)
                 } else {
                     bemUpdater.setupTransformationChecker(character)

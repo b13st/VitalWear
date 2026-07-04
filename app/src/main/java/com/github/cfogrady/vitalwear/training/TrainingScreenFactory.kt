@@ -20,6 +20,7 @@ import com.github.cfogrady.vitalwear.common.composable.util.KeepScreenOn
 import com.github.cfogrady.vitalwear.common.composable.util.formatNumber
 import com.github.cfogrady.vitalwear.composable.util.*
 import com.github.cfogrady.vitalwear.data.GameState
+import com.github.cfogrady.vitalwear.util.EventHaptics
 import com.github.cfogrady.vitalwear.firmware.Firmware
 import com.github.cfogrady.vitalwear.firmware.components.TrainingBitmaps
 import com.google.common.collect.Lists
@@ -32,6 +33,7 @@ class TrainingScreenFactory(private val vitalBoxFactory: VitalBoxFactory,
                             private val backgroundHeight: Dp,
                             private val trainingService: TrainingService,
                             private val gameStateFlow: MutableStateFlow<GameState>,
+                            private val eventHaptics: EventHaptics,
 ) {
 
     companion object {
@@ -208,6 +210,7 @@ class TrainingScreenFactory(private val vitalBoxFactory: VitalBoxFactory,
         val characterAnimation = remember {Lists.newArrayList(partner.characterSprites.sprites[CharacterSprites.IDLE_1], partner.characterSprites.sprites[CharacterSprites.WIN])}
         val resultIcon = remember {if(trainingResult == TrainingResult.GREAT) firmware.trainingBitmaps.greatIcon else firmware.trainingBitmaps.goodIcon}
         LaunchedEffect(true) {
+            eventHaptics.trainingResult(trainingResult == TrainingResult.GREAT)
             Handler(Looper.getMainLooper()!!).postDelayed({
                 finished.invoke()
             }, 1000)

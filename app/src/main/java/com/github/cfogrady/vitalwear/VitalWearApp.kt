@@ -61,6 +61,7 @@ import com.github.cfogrady.vitalwear.steps.StepIOService
 import com.github.cfogrady.vitalwear.steps.StepSensorService
 import com.github.cfogrady.vitalwear.steps.StepState
 import com.github.cfogrady.vitalwear.training.BackgroundTrainingScreenFactory
+import com.github.cfogrady.vitalwear.util.EventHaptics
 import com.github.cfogrady.vitalwear.util.SensorThreadHandler
 import com.github.cfogrady.vitalwear.training.TrainingScreenFactory
 import com.github.cfogrady.vitalwear.training.TrainingService
@@ -125,6 +126,7 @@ class VitalWearApp : Application(), Configuration.Provider {
     lateinit var firmwareReceiver: FirmwareReceiver
     lateinit var characterReceiver: CharacterReceiver
     lateinit var moodService: MoodService
+    lateinit var eventHaptics: EventHaptics
     lateinit var settingsComposableFactory: SettingsComposableFactory
     private lateinit var applicationBootManager: ApplicationBootManager
     private lateinit var vbUpdater: VBUpdater
@@ -185,6 +187,9 @@ class VitalWearApp : Application(), Configuration.Provider {
         val stepIOService = StepIOService(sharedPreferences, stepState)
         saveService = SaveService(characterManager as CharacterManagerImpl, stepIOService, sharedPreferences)
         stepService = StepSensorService(sensorManager, sensorThreadHandler, Lists.newArrayList(vitalService), stepState, stepIOService, saveService)
+        eventHaptics = EventHaptics(applicationContext) {
+            characterManager.getCurrentCharacter()?.characterStats?.sleeping == true
+        }
         moodService = MoodService(heartRateService, sensorManager, vbUpdater, characterManager, vitalService, saveService)
         moodBroadcastReceiver = MoodBroadcastReceiver(moodService)
 
@@ -209,15 +214,15 @@ class VitalWearApp : Application(), Configuration.Provider {
         val goScreenFactory = GoScreenFactory(bitmapScaler, backgroundHeight)
         val attackScreenFactory = AttackScreenFactory(bitmapScaler, backgroundHeight)
         val hpCompareFactory = HPCompareFactory(bitmapScaler, backgroundHeight)
-        val endFightReactionFactory = EndFightReactionFactory(bitmapScaler, firmwareManager, characterManager, backgroundHeight)
+        val endFightReactionFactory = EndFightReactionFactory(bitmapScaler, firmwareManager, characterManager, backgroundHeight, eventHaptics)
         val endFightVitalsFactory = EndFightVitalsFactory(bitmapScaler, firmwareManager, backgroundManager, backgroundHeight)
         fightTargetFactory = FightTargetFactory(battleService, vitalBoxFactory, opponentSplashFactory, opponentNameScreenFactory, readyScreenFactory, goScreenFactory, attackScreenFactory, hpCompareFactory, endFightReactionFactory, endFightVitalsFactory)
-        trainingScreenFactory = TrainingScreenFactory(vitalBoxFactory, bitmapScaler, backgroundHeight, trainingService, gameState)
+        trainingScreenFactory = TrainingScreenFactory(vitalBoxFactory, bitmapScaler, backgroundHeight, trainingService, gameState, eventHaptics)
         backgroundTrainingScreenFactory = BackgroundTrainingScreenFactory(trainingScreenFactory, trainingService)
 
         transformationScreenFactory = TransformationScreenFactory(characterManager, backgroundHeight, firmwareManager, bitmapScaler, vitalBoxFactory, vbUpdater)
         partnerScreenComposable = PartnerScreenComposable(bitmapScaler, backgroundHeight, stepService, heartRateService)
-        adventureService = AdventureService(gameState, database.cardMetaEntityDao(), characterManager, database.adventureEntityDao(), cardSpriteIO, notificationChannelManager, database.characterAdventureDao(), stepService, sensorManager)
+        adventureService = AdventureService(gameState, database.cardMetaEntityDao(), characterManager, database.adventureEntityDao(), cardSpriteIO, notificationChannelManager, database.characterAdventureDao(), stepService, sensorManager, eventHaptics)
         val cardCharacterImageService = CardCharacterImageService(database.speciesEntityDao(), characterSpritesIO)
         previewCharacterManager = PreviewCharacterManager(database.characterDao(), cardCharacterImageService)
         shutdownReceiver = ShutdownReceiver(shutdownManager)
