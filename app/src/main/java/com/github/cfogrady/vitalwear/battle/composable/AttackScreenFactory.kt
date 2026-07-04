@@ -6,12 +6,14 @@ import android.os.Looper
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import com.github.cfogrady.vitalwear.battle.data.PostBattleModel
@@ -263,7 +265,12 @@ class AttackScreenFactory(val bitmapScaler: BitmapScaler, val backgroundHeight: 
             delay(1000)
             onFinish.invoke()
         }
-        bitmapScaler.ScaledBitmap(bitmap = cutIn, contentDescription = "Cut In")
+        // Black side bars behind the 1:2 splash art, matching the entry splash screen.
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black), contentAlignment = Alignment.Center) {
+            bitmapScaler.ScaledBitmap(bitmap = cutIn, contentDescription = "Cut In")
+        }
     }
 
     @Composable
