@@ -1,6 +1,6 @@
 package com.github.cfogrady.vitalwear.battle.data
 
-class Battle(
+data class Battle(
     val battleResult: BattleResult,
     val startingPartnerHp: Int,
     val startingEnemyHp: Int,

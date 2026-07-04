@@ -44,6 +44,11 @@ class BattleService(private val cardSpritesIO: CardSpritesIO,
                     private val dimToBemStatConversion: DimToBemStatConversion,
 ) {
 
+    companion object {
+        // A lost battle sometimes injures the partner, like on the original device.
+        const val INJURY_CHANCE_ON_LOSS_PERCENT = 30
+    }
+
     suspend fun createBattleModel(context: Context, battleTargetInfo: BattleCharacterInfo): PreBattleModel {
         val partnerCharacter = characterManager.getCharacterFlow().value!!
         val firmware = firmwareManager.getFirmware().value!!
@@ -129,7 +134,7 @@ class BattleService(private val cardSpritesIO: CardSpritesIO,
     fun performBattle(preBattleModel: PreBattleModel, preDeterminedHits: Array<Boolean> = emptyArray()): PostBattleModel {
         val partnerCharacter = characterManager.getCharacterFlow().value!!
         val firmware = firmwareManager.getFirmware().value!!
-        val battle = battleLogic.performBattle(preBattleModel, preDeterminedHits)
+        val battle = maybeApplyInjury(partnerCharacter, battleLogic.performBattle(preBattleModel, preDeterminedHits))
         partnerCharacter.characterStats.totalBattles++
         partnerCharacter.characterStats.currentPhaseBattles++
         if(battle.battleResult == BattleResult.WIN) {
@@ -147,6 +152,31 @@ class BattleService(private val cardSpritesIO: CardSpritesIO,
         }
         val vitalChange = vitalService.processVitalChangeFromBattle(partnerCharacter.speciesStats.phase, preBattleModel.opponent.battleStats.stage, battle.battleResult == BattleResult.WIN)
         saveService.saveAsync()
+        return buildPostBattleModel(preBattleModel, battle, firmware, vitalChange)
+    }
+
+    /**
+     * Losing a battle can injure the partner, like on the original device. An injured
+     * partner earns half vitals until healed by a full rest (see SleepService), and the
+     * end-of-fight screen shows the injured reaction instead of the plain loss.
+     */
+    private fun maybeApplyInjury(partnerCharacter: VBCharacter, battle: Battle): Battle {
+        if (battle.battleResult != BattleResult.LOSE) {
+            return battle
+        }
+        val stats = partnerCharacter.characterStats
+        if (stats.injured) {
+            stats.lostBattlesInjured++
+        }
+        if (random.nextInt(100) >= INJURY_CHANCE_ON_LOSS_PERCENT) {
+            return battle
+        }
+        stats.injured = true
+        stats.accumulatedDailyInjuries++
+        return battle.copy(battleResult = BattleResult.INJURED)
+    }
+
+    private fun buildPostBattleModel(preBattleModel: PreBattleModel, battle: Battle, firmware: Firmware, vitalChange: Int): PostBattleModel {
         return PostBattleModel(
             preBattleModel.partnerCharacter,
             preBattleModel.supportCharacter,
