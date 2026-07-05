@@ -135,6 +135,7 @@ class SettingsComposableFactory(private val backgroundManager: BackgroundManager
                         val autoSleepEnabled by sleepService.autoSleepEnabled.collectAsState()
                         val bedHour by sleepService.bedHour.collectAsState()
                         val wakeHour by sleepService.wakeHour.collectAsState()
+                        val pauseTraining by sleepService.pauseTrainingWhileSleeping.collectAsState()
                         Column(
                             modifier = Modifier.fillMaxSize(),
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -153,6 +154,14 @@ class SettingsComposableFactory(private val backgroundManager: BackgroundManager
                             if (autoSleepEnabled) {
                                 HourSettingRow(label = "Bed", hour = bedHour) { sleepService.setBedHour(it) }
                                 HourSettingRow(label = "Wake", hour = wakeHour) { sleepService.setWakeHour(it) }
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                                .padding(0.dp, 8.dp, 0.dp, 0.dp)
+                                .clickable {
+                                    sleepService.setPauseTrainingWhileSleeping(!pauseTraining)
+                                }) {
+                                RadioButton(selected = pauseTraining, modifier = Modifier.scale(.5f))
+                                Text(text = if (pauseTraining) "Training Paused While Asleep" else "Training Runs While Asleep", fontSize = 1.7.em)
                             }
                         }
                     }

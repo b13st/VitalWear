@@ -67,7 +67,10 @@ class StatsMenuActivity : ComponentActivity() {
         var currentOption by remember { mutableStateOf<TransformationOption?>(null) }
         val partner = remember { characterManager.getCurrentCharacter()!! }
         LaunchedEffect(true) {
-            characterManager.getCharacterFlow().value!!.characterStats.updateTimeStamps(LocalDateTime.now())
+            characterManager.getCharacterFlow().value!!.characterStats.updateTimeStamps(
+                LocalDateTime.now(),
+                (application as VitalWearApp).sleepService.pauseTrainingWhileSleeping.value,
+            )
             withContext(Dispatchers.IO) {
                 currentOption = partner.hasValidTransformation()
             }

@@ -54,8 +54,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        val characterManager = (application as VitalWearApp).characterManager
-        characterManager.getCurrentCharacter()?.characterStats?.updateTimeStamps(LocalDateTime.now())
+        val app = application as VitalWearApp
+        app.characterManager.getCurrentCharacter()?.characterStats
+            ?.updateTimeStamps(LocalDateTime.now(), app.sleepService.pauseTrainingWhileSleeping.value)
     }
 
     override fun onStop() {

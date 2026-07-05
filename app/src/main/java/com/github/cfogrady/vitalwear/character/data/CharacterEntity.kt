@@ -68,15 +68,20 @@ data class CharacterEntity (
     }
 
     @Synchronized
-    fun updateTimeStamps(now: LocalDateTime) {
+    fun updateTimeStamps(now: LocalDateTime, pauseTrainingWhileAsleep: Boolean = false) {
         val deltaTimeInSeconds = Duration.between(lastUpdate, now).seconds
         if(deltaTimeInSeconds <= 0) {
             Timber.i("Already updated to timestamp. Skipping update")
             return
         }
-        trainingTimeRemainingInSeconds -= deltaTimeInSeconds
-        if(trainingTimeRemainingInSeconds < 0) {
-            trainingTimeRemainingInSeconds = 0
+        // Optionally freeze the training-limit timer while sleeping, like the original
+        // device where timers pause overnight. lastUpdate still advances so the paused
+        // time is simply not counted.
+        if(!(pauseTrainingWhileAsleep && sleeping)) {
+            trainingTimeRemainingInSeconds -= deltaTimeInSeconds
+            if(trainingTimeRemainingInSeconds < 0) {
+                trainingTimeRemainingInSeconds = 0
+            }
         }
         timeUntilNextTransformation -= deltaTimeInSeconds
         if(timeUntilNextTransformation < 0) {

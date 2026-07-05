@@ -21,12 +21,17 @@ class SleepService(
         const val AUTO_SLEEP_ENABLED = "AUTO_SLEEP_ENABLED"
         const val AUTO_SLEEP_BED_HOUR = "AUTO_SLEEP_BED_HOUR"
         const val AUTO_SLEEP_WAKE_HOUR = "AUTO_SLEEP_WAKE_HOUR"
+        const val PAUSE_TRAINING_WHILE_SLEEPING = "PAUSE_TRAINING_WHILE_SLEEPING"
         const val DEFAULT_BED_HOUR = 22
         const val DEFAULT_WAKE_HOUR = 7
     }
 
     private val _autoSleepEnabled = MutableStateFlow(sharedPreferences.getBoolean(AUTO_SLEEP_ENABLED, false))
     val autoSleepEnabled: StateFlow<Boolean> = _autoSleepEnabled
+
+    // When on, the training-limit timer does not tick down while the partner sleeps.
+    private val _pauseTrainingWhileSleeping = MutableStateFlow(sharedPreferences.getBoolean(PAUSE_TRAINING_WHILE_SLEEPING, false))
+    val pauseTrainingWhileSleeping: StateFlow<Boolean> = _pauseTrainingWhileSleeping
 
     private val _bedHour = MutableStateFlow(sharedPreferences.getInt(AUTO_SLEEP_BED_HOUR, DEFAULT_BED_HOUR))
     val bedHour: StateFlow<Int> = _bedHour
@@ -37,6 +42,11 @@ class SleepService(
     fun setAutoSleepEnabled(enabled: Boolean) {
         _autoSleepEnabled.value = enabled
         sharedPreferences.edit().putBoolean(AUTO_SLEEP_ENABLED, enabled).apply()
+    }
+
+    fun setPauseTrainingWhileSleeping(enabled: Boolean) {
+        _pauseTrainingWhileSleeping.value = enabled
+        sharedPreferences.edit().putBoolean(PAUSE_TRAINING_WHILE_SLEEPING, enabled).apply()
     }
 
     fun setBedHour(hour: Int) {

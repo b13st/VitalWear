@@ -52,6 +52,9 @@ class CharacterManagerImpl(
     private lateinit var vbUpdater: VBUpdater
     override val initialized = MutableStateFlow(false)
 
+    // Wired by VitalWearApp after SleepService is built (avoids a construction cycle).
+    var pauseTrainingWhileAsleepProvider: () -> Boolean = { false }
+
     suspend fun init(applicationContext: Context, vbUpdater: VBUpdater) {
         Timber.i("Initializing character manager")
         this.vbUpdater = vbUpdater
@@ -210,7 +213,7 @@ class CharacterManagerImpl(
     }
 
     private fun updateCharacterStats(character: CharacterEntity, now: LocalDateTime) {
-        character.updateTimeStamps(now)
+        character.updateTimeStamps(now, pauseTrainingWhileAsleepProvider())
         characterDao.update(character)
     }
 
