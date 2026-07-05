@@ -219,7 +219,7 @@ fun SendAnimation(controller: SendAnimationController, idleBitmap: Bitmap, walkB
         targetAnimation = 11
     }
     controller.vitalBoxFactory.VitalBox {
-        controller.bitmapScaler.ScaledBitmap(controller.transferBackground, "Background", alignment = Alignment.BottomCenter)
+        controller.bitmapScaler.FillHeightBitmap(controller.transferBackground, "Background", alignment = Alignment.BottomCenter)
 
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
             if(flicker % 2 == 0) {
@@ -296,7 +296,7 @@ fun ReceiveAnimation(controller: ReceiveAnimationController, onComplete: () -> U
         }
     }
     controller.vitalBoxFactory.VitalBox {
-        controller.bitmapScaler.ScaledBitmap(controller.transferBackground, "Background", alignment = Alignment.BottomCenter)
+        controller.bitmapScaler.FillHeightBitmap(controller.transferBackground, "Background", alignment = Alignment.BottomCenter)
 
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
             if(flicker % 2 == 1) {
