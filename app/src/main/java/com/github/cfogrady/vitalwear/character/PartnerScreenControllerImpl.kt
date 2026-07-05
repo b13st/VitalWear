@@ -44,9 +44,6 @@ internal class PartnerScreenControllerImpl(
         }
         return@mapState it.characterStats.vitals
     }
-    override val sleeping = characterManager.getCharacterFlow().mapState {
-        it?.characterStats?.sleeping == true
-    }
 
     private fun getIdleFlow(coroutineScope: CoroutineScope): StateFlow<Boolean> {
         var job: Job? = null

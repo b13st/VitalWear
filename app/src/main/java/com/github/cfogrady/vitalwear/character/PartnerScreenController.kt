@@ -22,7 +22,6 @@ interface PartnerScreenController {
     val dailyStepCount: StateFlow<Int>
     val emoteBitmaps: StateFlow<List<Bitmap?>> // nullable because some emotes blink instead of animate. A null indicates a blink frame.
     val vitals: StateFlow<Int>
-    val sleeping: StateFlow<Boolean>
     fun getCharacterBitmaps(coroutineScope: CoroutineScope): StateFlow<List<Bitmap>>
     fun getTimeFlow(coroutineScope: CoroutineScope): StateFlow<LocalDateTime>
 
@@ -51,7 +50,6 @@ interface PartnerScreenController {
         private val characterBitmaps: StateFlow<List<Bitmap>> = MutableStateFlow(characterSprites.sprites.subList(CharacterSprites.IDLE_1, CharacterSprites.IDLE_2+1)),
         override val emoteBitmaps: StateFlow<List<Bitmap>> = MutableStateFlow(firmware.characterIconBitmaps.emoteBitmaps.happyEmote),
         override val vitals: StateFlow<Int> = MutableStateFlow(3784),
-        override val sleeping: StateFlow<Boolean> = MutableStateFlow(false),
     ): PartnerScreenController {
 
         override fun getCharacterBitmaps(coroutineScope: CoroutineScope): StateFlow<List<Bitmap>> {

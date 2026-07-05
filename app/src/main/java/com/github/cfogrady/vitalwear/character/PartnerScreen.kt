@@ -1,7 +1,6 @@
 package com.github.cfogrady.vitalwear.character
 
 import android.graphics.BitmapFactory
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,14 +41,7 @@ fun PartnerScreen(controller: PartnerScreenController) {
     val emojiHeight = bitmapScaler.scaledDimension(firmware.emoteBitmaps.sweatEmote.height)
     val vbWidth = bitmapScaler.scaledDimension(ImageScaler.VB_WIDTH.toInt())
     val now by remember {controller.getTimeFlow(coroutineScope)}.collectAsStateWithLifecycle()
-    val sleeping by controller.sleeping.collectAsStateWithLifecycle()
 
-    // Night dim while the partner sleeps, like the darkened screen of the original device.
-    if (sleeping) {
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.55f)))
-    }
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
         Column(verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
             .width(vbWidth)
