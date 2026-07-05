@@ -25,6 +25,8 @@ import com.github.cfogrady.vitalwear.common.card.db.TransformationEntity
 import com.github.cfogrady.vitalwear.common.card.db.TransformationEntityDao
 import com.github.cfogrady.vitalwear.common.data.LocalDateTimeConverters
 import com.github.cfogrady.vitalwear.common.data.migrations.DropClearedFromAdventure
+import com.github.cfogrady.vitalwear.character.mission.SpecialMissionDao
+import com.github.cfogrady.vitalwear.character.mission.SpecialMissionEntity
 import com.github.cfogrady.vitalwear.settings.CardSettingsDao
 import com.github.cfogrady.vitalwear.settings.CardSettingsEntity
 import com.github.cfogrady.vitalwear.settings.CharacterSettingsDao
@@ -41,8 +43,9 @@ import com.github.cfogrady.vitalwear.settings.CharacterSettingsEntity
     CharacterSettingsEntity::class,
     CharacterAdventureEntity::class,
     TransformationHistoryEntity::class,
-    CardSettingsEntity::class],
-    version = 8,
+    CardSettingsEntity::class,
+    SpecialMissionEntity::class],
+    version = 9,
     autoMigrations = [
         AutoMigration(from = 2, to = 3, spec = DropClearedFromAdventure::class),
         AutoMigration(from = 3, to = 4),
@@ -50,6 +53,7 @@ import com.github.cfogrady.vitalwear.settings.CharacterSettingsEntity
         AutoMigration(from = 5, to = 6),
         AutoMigration(from = 6, to = 7),
         AutoMigration(from = 7, to = 8),
+        AutoMigration(from = 8, to = 9),
     ])
 @TypeConverters(LocalDateTimeConverters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -67,6 +71,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun characterAdventureDao(): CharacterAdventureDao
 
     abstract fun transformationHistoryDao(): TransformationHistoryDao
+
+    abstract fun specialMissionDao(): SpecialMissionDao
 
     abstract fun cardSettingsDao(): CardSettingsDao
 

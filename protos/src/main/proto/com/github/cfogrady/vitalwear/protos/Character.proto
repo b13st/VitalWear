@@ -77,4 +77,37 @@ message Character {
   repeated TransformationEvent transformation_history = 5;
 
   map<string, int32> max_adventure_completed_by_card = 6;
+
+  message SpecialMission {
+    // Enum numbers MUST equal lib-vb-nfc SpecialMission.Type ordinals
+    // (NONE=0, STEPS=1, VITALS=2, BATTLES=3, WINS=4). They are the raw bytes
+    // written to NFC blocks 16-19 on real bracelets. NEVER reorder or renumber.
+    enum Type {
+      SPECIAL_MISSION_TYPE_NONE = 0;
+      SPECIAL_MISSION_TYPE_STEPS = 1;
+      SPECIAL_MISSION_TYPE_VITALS = 2;
+      SPECIAL_MISSION_TYPE_BATTLES = 3;
+      SPECIAL_MISSION_TYPE_WINS = 4;
+    }
+    // Enum numbers MUST equal lib-vb-nfc SpecialMission.Status ordinals:
+    // UNAVAILABLE=0, IN_PROGRESS=1, FAILED=2, COMPLETED=3, AVAILABLE=4. NEVER reorder.
+    enum Status {
+      SPECIAL_MISSION_STATUS_UNAVAILABLE = 0;
+      SPECIAL_MISSION_STATUS_IN_PROGRESS = 1;
+      SPECIAL_MISSION_STATUS_FAILED = 2;
+      SPECIAL_MISSION_STATUS_COMPLETED = 3;
+      SPECIAL_MISSION_STATUS_AVAILABLE = 4;
+    }
+    Type type = 1;
+    Status status = 2;
+    int32 watch_id = 3;
+    int32 goal = 4;
+    int32 progress = 5;
+    int32 time_limit_in_minutes = 6;
+    int32 time_elapsed_in_minutes = 7;
+  }
+
+  // Exactly 0 or 4 entries in slot order (slot0=STEPS, slot1=VITALS, slot2=BATTLES,
+  // slot3=WINS by VBHelper convention). Readers must tolerate 0..N entries and cap at 4.
+  repeated SpecialMission special_missions = 7;
 }

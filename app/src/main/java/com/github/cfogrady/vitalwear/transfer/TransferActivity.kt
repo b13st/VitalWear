@@ -14,6 +14,8 @@ import com.github.cfogrady.vitalwear.character.CharacterManager
 import com.github.cfogrady.vitalwear.character.VBCharacter
 import com.github.cfogrady.vitalwear.character.data.CharacterEntity
 import com.github.cfogrady.vitalwear.character.data.CharacterState
+import com.github.cfogrady.vitalwear.character.mission.SpecialMissionDao
+import com.github.cfogrady.vitalwear.character.mission.SpecialMissionEntity
 import com.github.cfogrady.vitalwear.character.transformation.history.TransformationHistoryEntity
 import com.github.cfogrady.vitalwear.common.card.CharacterSpritesIO
 import com.github.cfogrady.vitalwear.common.card.CardType
@@ -86,6 +88,7 @@ class TransferActivity: ComponentActivity(), TransferScreenController {
                 maxAdventureCompletedByCard = maxAdventureIdxCompletedByCard,
                 currentExerciseLevel = app.heartRateService.currentExerciseLevel.value,
                 heartRateCurrent = app.heartRateService.lastHeartRate.value,
+                specialMissions = app.database.specialMissionDao().getByCharacterId(it.characterStats.id),
             )
         }
         return null
@@ -118,6 +121,7 @@ class TransferActivity: ComponentActivity(), TransferScreenController {
             importCharacter.settings.toCharacterSettings(),
             importCharacter.transformationHistoryList.toTransformationHistoryEntities()
         )
+        persistImportedSpecialMissions(importCharacter, characterId, (application as VitalWearApp).database.specialMissionDao())
         adventureService.addCharacterAdventures(characterId, importCharacter.maxAdventureCompletedByCardMap)
         val happy = characterManager.getCharacterBitmap(this, importCharacter.cardName, importCharacter.characterStats.slotId, CharacterSpritesIO.WIN)
         val idle = characterManager.getCharacterBitmap(this, importCharacter.cardName, importCharacter.characterStats.slotId, CharacterSpritesIO.IDLE1)
@@ -144,6 +148,7 @@ fun VBCharacter.toProto(
     maxAdventureCompletedByCard: Map<String, Int>,
     currentExerciseLevel: Int = 0,
     heartRateCurrent: Int = 0,
+    specialMissions: List<SpecialMissionEntity> = emptyList(),
 ): Character {
     val generation = (transformationHistory.size - 1).coerceAtLeast(0)
     val totalTrophies = this.characterStats.trainedPP.coerceAtLeast(0)
@@ -164,7 +169,49 @@ fun VBCharacter.toProto(
         .setSettings(this.settings.toProto())
         .addAllTransformationHistory(transformationHistory.toProtoList())
         .putAllMaxAdventureCompletedByCard(maxAdventureCompletedByCard)
+        .addAllSpecialMissions(specialMissions.map { it.toProto() })
         .build()
+}
+
+fun SpecialMissionEntity.toProto(): Character.SpecialMission {
+    return Character.SpecialMission.newBuilder()
+        .setTypeValue(this.type.coerceIn(0, 4))
+        .setStatusValue(this.status.coerceIn(0, 4))
+        .setWatchId(this.watchId.coerceAtLeast(0))
+        .setGoal(this.goal.coerceAtLeast(0))
+        .setProgress(this.progress.coerceAtLeast(0))
+        .setTimeLimitInMinutes(this.timeLimitInMinutes.coerceAtLeast(0))
+        .setTimeElapsedInMinutes(this.timeElapsedInMinutes.coerceAtLeast(0))
+        .build()
+}
+
+/**
+ * Persists the missions carried by an imported character. Shared by all three import
+ * pipelines (transfer UI, HCE service, phone channel) so they cannot drift.
+ */
+fun persistImportedSpecialMissions(
+    character: Character,
+    characterId: Int,
+    specialMissionDao: SpecialMissionDao,
+    nowMillis: Long = System.currentTimeMillis(),
+) {
+    val missions = character.specialMissionsList.take(4).mapIndexed { idx, mission ->
+        SpecialMissionEntity(
+            characterId = characterId,
+            slot = idx,
+            type = mission.typeValue.takeIf { it in 0..4 } ?: 0,
+            status = mission.statusValue.takeIf { it in 0..4 } ?: 0,
+            watchId = mission.watchId.coerceAtLeast(0),
+            goal = mission.goal.coerceAtLeast(0),
+            progress = mission.progress.coerceAtLeast(0),
+            timeLimitInMinutes = mission.timeLimitInMinutes.coerceAtLeast(0),
+            timeElapsedInMinutes = mission.timeElapsedInMinutes.coerceAtLeast(0),
+            lastProgressEpochMillis = nowMillis,
+        )
+    }
+    if (missions.isNotEmpty()) {
+        specialMissionDao.insertAll(missions)
+    }
 }
 
 fun List<TransformationHistoryEntity>.toProtoList(): List<Character.TransformationEvent> {
@@ -580,6 +627,20 @@ fun Character.sanitizeForImport(): Character {
         .putAllMaxAdventureCompletedByCard(
             this.maxAdventureCompletedByCardMap.filterKeys { it.isNotBlank() }
                 .mapValues { (_, value) -> value.coerceAtLeast(0) }
+        )
+        .addAllSpecialMissions(
+            // Raw value getters so unknown future enum values clamp instead of throwing.
+            this.specialMissionsList.take(4).map { mission ->
+                Character.SpecialMission.newBuilder()
+                    .setTypeValue(mission.typeValue.takeIf { it in 0..4 } ?: 0)
+                    .setStatusValue(mission.statusValue.takeIf { it in 0..4 } ?: 0)
+                    .setWatchId(mission.watchId.coerceAtLeast(0))
+                    .setGoal(mission.goal.coerceAtLeast(0))
+                    .setProgress(mission.progress.coerceAtLeast(0))
+                    .setTimeLimitInMinutes(mission.timeLimitInMinutes.coerceAtLeast(0))
+                    .setTimeElapsedInMinutes(mission.timeElapsedInMinutes.coerceAtLeast(0))
+                    .build()
+            }
         )
         .build()
 }

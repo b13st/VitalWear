@@ -9,6 +9,7 @@ import com.github.cfogrady.vitalwear.battle.data.*
 import com.github.cfogrady.vitalwear.card.DimToBemStatConversion
 import com.github.cfogrady.vitalwear.character.CharacterManager
 import com.github.cfogrady.vitalwear.character.VBCharacter
+import com.github.cfogrady.vitalwear.character.mission.MissionService
 import com.github.cfogrady.vitalwear.character.data.Mood
 import com.github.cfogrady.vitalwear.common.card.CardSpritesIO
 import com.github.cfogrady.vitalwear.common.card.CardType
@@ -42,6 +43,7 @@ class BattleService(private val cardSpritesIO: CardSpritesIO,
                     private val cardSettingsDao: CardSettingsDao,
                     private val cardMetaEntityDao: CardMetaEntityDao,
                     private val dimToBemStatConversion: DimToBemStatConversion,
+                    private val missionService: MissionService,
 ) {
 
     companion object {
@@ -150,6 +152,7 @@ class BattleService(private val cardSpritesIO: CardSpritesIO,
                 partnerCharacter.characterStats.mood = 0
             }
         }
+        missionService.onBattle(battle.battleResult == BattleResult.WIN)
         val vitalChange = vitalService.processVitalChangeFromBattle(partnerCharacter.speciesStats.phase, preBattleModel.opponent.battleStats.stage, battle.battleResult == BattleResult.WIN)
         saveService.saveAsync()
         return buildPostBattleModel(preBattleModel, battle, firmware, vitalChange)

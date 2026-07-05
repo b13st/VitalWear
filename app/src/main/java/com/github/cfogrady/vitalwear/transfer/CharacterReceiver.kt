@@ -4,6 +4,7 @@ import android.content.Context
 import com.github.cfogrady.vitalwear.adventure.AdventureService
 import com.github.cfogrady.vitalwear.character.CharacterManager
 import com.github.cfogrady.vitalwear.character.data.CharacterState
+import com.github.cfogrady.vitalwear.character.mission.SpecialMissionDao
 import com.github.cfogrady.vitalwear.common.card.db.CardMetaEntityDao
 import com.github.cfogrady.vitalwear.common.card.db.SpeciesEntityDao
 import com.github.cfogrady.vitalwear.common.data.SharedTransferSeenDao
@@ -21,6 +22,7 @@ class CharacterReceiver(
     private val cardMetaEntityDao: CardMetaEntityDao,
     private val speciesEntityDao: SpeciesEntityDao,
     private val transferSeenDao: SharedTransferSeenDao,
+    private val specialMissionDao: SpecialMissionDao,
 ) {
     data class ImportCharacterResult(val success: Boolean, val cardName: String?)
 
@@ -47,6 +49,7 @@ class CharacterReceiver(
                             importCharacter.settings.toCharacterSettings(),
                             importCharacter.transformationHistoryList.toTransformationHistoryEntities()
                         )
+                        persistImportedSpecialMissions(importCharacter, characterId, specialMissionDao)
                         adventureService.addCharacterAdventures(characterId, importCharacter.maxAdventureCompletedByCardMap)
                         characterManager.swapToCharacter(
                             context,

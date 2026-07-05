@@ -28,6 +28,7 @@ import com.github.cfogrady.vitalwear.character.VBUpdater
 import com.github.cfogrady.vitalwear.character.CharacterManager
 import com.github.cfogrady.vitalwear.character.CharacterManagerImpl
 import com.github.cfogrady.vitalwear.character.SleepService
+import com.github.cfogrady.vitalwear.character.mission.MissionService
 import com.github.cfogrady.vitalwear.character.data.PreviewCharacterManager
 import com.github.cfogrady.vitalwear.character.mood.MoodBroadcastReceiver
 import com.github.cfogrady.vitalwear.character.mood.MoodService
@@ -129,6 +130,7 @@ class VitalWearApp : Application(), Configuration.Provider {
     lateinit var moodService: MoodService
     lateinit var eventHaptics: EventHaptics
     lateinit var sleepService: SleepService
+    lateinit var missionService: MissionService
     lateinit var settingsComposableFactory: SettingsComposableFactory
     private lateinit var applicationBootManager: ApplicationBootManager
     private lateinit var vbUpdater: VBUpdater
@@ -176,31 +178,32 @@ class VitalWearApp : Application(), Configuration.Provider {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationChannelManager = NotificationChannelManager(notificationManager)
         complicationRefreshService = ComplicationRefreshService(this, partnerComplicationState)
-        characterManager = CharacterManagerImpl(complicationRefreshService, database.characterDao(), characterSpritesIO, database.speciesEntityDao(), database.cardMetaEntityDao(), database.transformationEntityDao(), database.characterSettingsDao(), database.characterAdventureDao(), database.transformationHistoryDao(), database.attributeFusionEntityDao(), database.specificFusionEntityDao(), dimToBemStatConversion)
+        characterManager = CharacterManagerImpl(complicationRefreshService, database.characterDao(), characterSpritesIO, database.speciesEntityDao(), database.cardMetaEntityDao(), database.transformationEntityDao(), database.characterSettingsDao(), database.characterAdventureDao(), database.transformationHistoryDao(), database.attributeFusionEntityDao(), database.specificFusionEntityDao(), dimToBemStatConversion, database.specialMissionDao())
+        missionService = MissionService(characterManager, database.specialMissionDao())
         cardMetaEntityDao = database.cardMetaEntityDao()
         val cardSpriteLoader = CardSpriteLoader()
         val commonCardLoader = CardLoader(characterSpritesIO, cardSpriteLoader, cardSpriteIO, cardMetaEntityDao, database.speciesEntityDao(), database.transformationEntityDao(), database.adventureEntityDao(), database.attributeFusionEntityDao(), database.specificFusionEntityDao(), DimReader())
         cardLoader = AppCardLoader(commonCardLoader, database.cardSettingsDao())
         val sensorManager = applicationContext.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        vitalService = VitalService(characterManager, complicationRefreshService)
+        vitalService = VitalService(characterManager, complicationRefreshService, missionService)
         heartRateService = HeartRateService(sensorManager, sensorThreadHandler)
         vbUpdater = VBUpdater(applicationContext)
         val stepState = StepState()
         val stepIOService = StepIOService(sharedPreferences, stepState)
         saveService = SaveService(characterManager as CharacterManagerImpl, stepIOService, sharedPreferences)
-        stepService = StepSensorService(sensorManager, sensorThreadHandler, Lists.newArrayList(vitalService), stepState, stepIOService, saveService)
+        stepService = StepSensorService(sensorManager, sensorThreadHandler, Lists.newArrayList(vitalService, missionService), stepState, stepIOService, saveService)
         eventHaptics = EventHaptics(applicationContext) {
             characterManager.getCurrentCharacter()?.characterStats?.sleeping == true
         }
         sleepService = SleepService(characterManager, saveService, sharedPreferences)
         moodService = MoodService(heartRateService, sensorManager, vbUpdater, characterManager, vitalService, saveService)
-        moodBroadcastReceiver = MoodBroadcastReceiver(moodService, sleepService)
+        moodBroadcastReceiver = MoodBroadcastReceiver(moodService, sleepService, missionService)
 
         trainingService = TrainingService(sensorManager, heartRateService, saveService)
         shutdownManager = ShutdownManager(saveService)
         val random = Random()
         val bemBattleLogic = BEMBattleLogic(random)
-        battleService = BattleService(cardSpriteIO, database.speciesEntityDao(), characterSpritesIO, characterManager, firmwareManager, bemBattleLogic, saveService, vitalService, backgroundManager, random, database.cardSettingsDao(), database.cardMetaEntityDao(), dimToBemStatConversion)
+        battleService = BattleService(cardSpriteIO, database.speciesEntityDao(), characterSpritesIO, characterManager, firmwareManager, bemBattleLogic, saveService, vitalService, backgroundManager, random, database.cardSettingsDao(), database.cardMetaEntityDao(), dimToBemStatConversion, missionService)
         imageScaler = ImageScaler(applicationContext.resources.displayMetrics, applicationContext.resources.configuration.isScreenRound)
         backgroundHeight = imageScaler.calculateBackgroundHeight()
         bitmapScaler = BitmapScaler(imageScaler)
@@ -232,7 +235,7 @@ class VitalWearApp : Application(), Configuration.Provider {
         applicationBootManager = ApplicationBootManager(characterManager as CharacterManagerImpl, firmwareManager, stepService, vbUpdater, moodService, notificationChannelManager, complicationRefreshService)
         cardReceiver = CardReceiver(cardLoader, notificationChannelManager)
         firmwareReceiver = FirmwareReceiver(firmwareManager, notificationChannelManager)
-        characterReceiver = CharacterReceiver(characterManager, adventureService, cardMetaEntityDao, database.speciesEntityDao(), sharedTransferSeenDao)
+        characterReceiver = CharacterReceiver(characterManager, adventureService, cardMetaEntityDao, database.speciesEntityDao(), sharedTransferSeenDao, database.specialMissionDao())
         settingsComposableFactory = SettingsComposableFactory(backgroundManager, vitalBoxFactory, bitmapScaler, logSettings, saveService, sleepService)
     }
 

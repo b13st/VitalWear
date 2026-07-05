@@ -4,6 +4,7 @@ import com.github.cfogrady.vitalwear.VitalWearApp
 import com.github.cfogrady.vitalwear.character.CharacterManager
 import com.github.cfogrady.vitalwear.character.data.CharacterState
 import com.github.cfogrady.vitalwear.protos.Character
+import com.github.cfogrady.vitalwear.transfer.persistImportedSpecialMissions
 import com.github.cfogrady.vitalwear.transfer.resolveImportedCardMeta
 import com.github.cfogrady.vitalwear.transfer.sanitizeForImport
 import com.github.cfogrady.vitalwear.transfer.toCharacterEntity
@@ -45,6 +46,7 @@ class VitalWearHceTransferRepository(
                 maxAdventureCompletedByCard = maxAdventureByCard,
                 currentExerciseLevel = app.heartRateService.currentExerciseLevel.value,
                 heartRateCurrent = app.heartRateService.lastHeartRate.value,
+                specialMissions = app.database.specialMissionDao().getByCharacterId(character.characterStats.id),
             ).toByteArray()
         }
     }
@@ -66,6 +68,8 @@ class VitalWearHceTransferRepository(
             importCharacter.settings.toCharacterSettings(),
             importCharacter.transformationHistoryList.toTransformationHistoryEntities()
         )
+        // Missions are part of the committed payload, not a best-effort extra.
+        persistImportedSpecialMissions(importCharacter, characterId, app.database.specialMissionDao())
         // The character is persisted at this point, so the transfer itself has succeeded.
         // Adventure completion and activating the character are best-effort extras: a failure
         // there must not report the whole transfer as failed to the user.

@@ -6,6 +6,7 @@ import com.github.cfogrady.vitalwear.adventure.data.CharacterAdventureDao
 import com.github.cfogrady.vitalwear.card.CardMeta
 import com.github.cfogrady.vitalwear.card.DimToBemStatConversion
 import com.github.cfogrady.vitalwear.character.data.*
+import com.github.cfogrady.vitalwear.character.mission.SpecialMissionDao
 import com.github.cfogrady.vitalwear.character.transformation.ExpectedTransformation
 import com.github.cfogrady.vitalwear.character.transformation.TransformationOption
 import com.github.cfogrady.vitalwear.character.transformation.history.TransformationHistoryDao
@@ -45,6 +46,7 @@ class CharacterManagerImpl(
     private val attributeFusionEntityDao: AttributeFusionEntityDao,
     private val specificFusionEntityDao: SpecificFusionEntityDao,
     private val dimToBemStatConversion: DimToBemStatConversion,
+    private val specialMissionDao: SpecialMissionDao,
 ) : CharacterManager {
     private val activeCharacterFlow = MutableStateFlow<VBCharacter?>(null)
     private lateinit var vbUpdater: VBUpdater
@@ -449,6 +451,7 @@ class CharacterManagerImpl(
         characterSettingsDao.deleteById(characterId)
         characterAdventureDao.deleteByCharacterId(characterId)
         transformationHistoryDao.deleteByCharacterId(characterId)
+        specialMissionDao.deleteByCharacterId(characterId)
         characterDao.deleteById(characterId)
     }
 

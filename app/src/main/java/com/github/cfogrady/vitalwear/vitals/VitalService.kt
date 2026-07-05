@@ -1,6 +1,7 @@
 package com.github.cfogrady.vitalwear.vitals
 
 import com.github.cfogrady.vitalwear.character.CharacterManager
+import com.github.cfogrady.vitalwear.character.mission.MissionService
 import com.github.cfogrady.vitalwear.character.VBCharacter
 import com.github.cfogrady.vitalwear.character.data.BEMCharacter
 import com.github.cfogrady.vitalwear.character.data.Mood
@@ -9,7 +10,7 @@ import com.github.cfogrady.vitalwear.steps.StepChangeListener
 import timber.log.Timber
 import java.time.LocalDateTime
 
-class VitalService(private val characterManager: CharacterManager, private val complicationRefreshService: ComplicationRefreshService, private val bootTime: LocalDateTime = LocalDateTime.now()) : StepChangeListener {
+class VitalService(private val characterManager: CharacterManager, private val complicationRefreshService: ComplicationRefreshService, private val missionService: MissionService, private val bootTime: LocalDateTime = LocalDateTime.now()) : StepChangeListener {
     companion object {
         const val STEPS_PER_VITAL = 50
     }
@@ -67,6 +68,9 @@ class VitalService(private val characterManager: CharacterManager, private val c
     fun addVitals(context: String, character: VBCharacter, newVitals: Int) {
         Timber.i("Add Vitals|$newVitals|$context")
         character.addVitals(newVitals)
+        if (newVitals > 0) {
+            missionService.onVitalsGained(newVitals)
+        }
         complicationRefreshService.refreshVitalsComplication()
     }
 
