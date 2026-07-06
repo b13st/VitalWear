@@ -5,11 +5,13 @@ import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -219,6 +221,8 @@ fun SendAnimation(controller: SendAnimationController, idleBitmap: Bitmap, walkB
         targetAnimation = 11
     }
     controller.vitalBoxFactory.VitalBox {
+        // Black backdrop behind the ray-of-light side bars, matching the evolution animation.
+        Box(modifier = Modifier.fillMaxSize().background(Color.Black))
         controller.bitmapScaler.FillHeightBitmap(controller.transferBackground, "Background", alignment = Alignment.BottomCenter)
 
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
@@ -296,6 +300,8 @@ fun ReceiveAnimation(controller: ReceiveAnimationController, onComplete: () -> U
         }
     }
     controller.vitalBoxFactory.VitalBox {
+        // Black backdrop behind the ray-of-light side bars, matching the evolution animation.
+        Box(modifier = Modifier.fillMaxSize().background(Color.Black))
         controller.bitmapScaler.FillHeightBitmap(controller.transferBackground, "Background", alignment = Alignment.BottomCenter)
 
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {

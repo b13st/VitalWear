@@ -265,11 +265,12 @@ class AttackScreenFactory(val bitmapScaler: BitmapScaler, val backgroundHeight: 
             delay(1000)
             onFinish.invoke()
         }
-        // Black side bars behind the 1:2 splash art, matching the entry splash screen.
+        // Same size/centering as the evolution splash: zoom to fill the height over a
+        // black backdrop, instead of the sprite's natural (smaller) size.
         Box(modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black), contentAlignment = Alignment.Center) {
-            bitmapScaler.ScaledBitmap(bitmap = cutIn, contentDescription = "Cut In")
+            .background(Color.Black)) {
+            bitmapScaler.FillHeightBitmap(bitmap = cutIn, contentDescription = "Cut In", alignment = Alignment.BottomCenter)
         }
     }
 
