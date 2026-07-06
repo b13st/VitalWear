@@ -200,7 +200,7 @@ class VitalWearApp : Application(), Configuration.Provider {
             sleepService.pauseTrainingWhileSleeping.value
         }
         moodService = MoodService(heartRateService, sensorManager, vbUpdater, characterManager, vitalService, saveService)
-        moodBroadcastReceiver = MoodBroadcastReceiver(moodService, sleepService, missionService)
+        moodBroadcastReceiver = MoodBroadcastReceiver(moodService, missionService)
 
         trainingService = TrainingService(sensorManager, heartRateService, saveService)
         shutdownManager = ShutdownManager(saveService)
