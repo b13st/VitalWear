@@ -130,24 +130,6 @@ class SettingsComposableFactory(private val backgroundManager: BackgroundManager
                             }
                         }
                     }
-                    SettingsMenuOption.SleepSettings -> {
-                        val pauseTraining by sleepService.pauseTrainingWhileSleeping.collectAsState()
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
-                        ) {
-                            Text(text = "SLEEP", fontSize = 2.1.em, fontWeight = FontWeight.Bold)
-                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-                                .padding(0.dp, 10.dp, 0.dp, 0.dp)
-                                .clickable {
-                                    sleepService.setPauseTrainingWhileSleeping(!pauseTraining)
-                                }) {
-                                RadioButton(selected = pauseTraining, modifier = Modifier.scale(.5f))
-                                Text(text = if (pauseTraining) "Training Paused While Asleep" else "Training Runs While Asleep", fontSize = 1.7.em)
-                            }
-                        }
-                    }
                     SettingsMenuOption.ToggleLogging -> {
                         var loggingEnabled by remember { mutableStateOf(logSettings.loggingEnabled()) }
                         val text = if(loggingEnabled) "DISABLE\nLOGS" else "ENABLE\nLOGS"
@@ -187,7 +169,6 @@ class SettingsComposableFactory(private val backgroundManager: BackgroundManager
         Background,
         BattleBackground,
         BackgroundMode,
-        SleepSettings,
         ToggleLogging,
         Save
     }
@@ -196,7 +177,6 @@ class SettingsComposableFactory(private val backgroundManager: BackgroundManager
         return listOf(SettingsMenuOption.Background,
             SettingsMenuOption.BattleBackground,
             SettingsMenuOption.BackgroundMode,
-            SettingsMenuOption.SleepSettings,
             SettingsMenuOption.ToggleLogging,
             SettingsMenuOption.Save)
     }
